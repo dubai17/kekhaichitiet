@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Trị Doanh Nghiệp PRO (Final)</title>
+    <title>Hệ Thống Quản Trị Doanh Nghiệp PRO (Final v4)</title>
     <style>
         :root {
             --primary-color: #007bff; --secondary-color: #6c757d; --success-color: #28a745;
@@ -179,7 +179,23 @@
 
     <div id="tab-cashflow" class="tab-pane">
         <div class="expense-layout">
-            <div class="card"><h3 style="color: var(--primary-color);">📝 Lập Phiếu Thu / Chi</h3><form id="cashflowForm" class="form-grid" style="grid-template-columns: 1fr;"><div style="display:flex; gap:10px;"><div style="flex:1"><label>Loại phiếu:</label><select id="cfType" class="form-control" style="font-weight:bold;"><option value="THU" style="color:green">➕ PHIẾU THU</option><option value="CHI" style="color:red">➖ PHIẾU CHI</option></select></div><div style="flex:1"><label>Ngày:</label><input type="date" id="cfDate" class="form-control" required></div></div><div><label>Số tiền (VND):</label><input type="number" id="cfAmount" class="form-control" required min="0"></div><div><label>Đơn hàng liên quan (Mã PXK - Tùy chọn):</label><input type="text" id="cfOrderId" class="form-control" placeholder="VD: PXK..."></div><div><label>Hạng mục:</label><input type="text" id="cfCategory" class="form-control" list="catList" placeholder="VD: Tiền điện, Ship, Bán phế liệu..."><datalist id="catList"><option value="Tiền điện/nước"><option value="Lương nhân viên"><option value="Thuê mặt bằng"><option value="Phí Ship"><option value="Thu khác"></datalist></div><div><label>Ghi chú:</label><input type="text" id="cfNote" class="form-control"></div><button type="submit" class="btn btn-primary">💾 Lưu Phiếu</button></form></div>
+            <div class="card"><h3 style="color: var(--primary-color);">📝 Lập Phiếu Thu / Chi</h3>
+            <form id="cashflowForm" class="form-grid" style="grid-template-columns: 1fr;">
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1"><label>Loại phiếu:</label><select id="cfType" class="form-control" style="font-weight:bold;"><option value="THU" style="color:green">➕ PHIẾU THU</option><option value="CHI" style="color:red">➖ PHIẾU CHI</option></select></div>
+                    <div style="flex:1"><label>Ngày:</label><input type="date" id="cfDate" class="form-control" required></div>
+                </div>
+                <div><label>Số tiền (VND):</label><input type="number" id="cfAmount" class="form-control" required min="0"></div>
+                <div>
+                    <label>Đơn hàng liên quan (Mã PXK - Tùy chọn):</label>
+                    <input type="text" id="cfOrderId" class="form-control" list="orderListSuggestions" placeholder="Gõ mã đơn hoặc chọn...">
+                    <datalist id="orderListSuggestions"></datalist>
+                </div>
+                <div><label>Hạng mục:</label><input type="text" id="cfCategory" class="form-control" list="catList" placeholder="VD: Tiền điện, Ship, Bán phế liệu..."><datalist id="catList"><option value="Tiền điện/nước"><option value="Lương nhân viên"><option value="Thuê mặt bằng"><option value="Phí Ship"><option value="Thu khác"></datalist></div>
+                <div><label>Ghi chú:</label><input type="text" id="cfNote" class="form-control"></div>
+                <button type="submit" class="btn btn-primary">💾 Lưu Phiếu</button>
+            </form>
+            </div>
             <div class="card"><h3>📜 Lịch Sử Thu Chi</h3><div style="max-height: 400px; overflow-y: auto;"><table id="cashflowTable"><thead><tr><th>Ngày</th><th>Loại</th><th>Số tiền</th><th>Đơn hàng</th><th>Mục</th><th>Xóa</th></tr></thead><tbody></tbody></table></div></div>
         </div>
     </div>
@@ -279,16 +295,12 @@
 
     let editingOrderId = null;
 
-    // --- KHỞI TẠO (QUAN TRỌNG: FIX LỖI MÀN HÌNH TRẮNG) ---
+    // --- KHỞI TẠO ---
     document.addEventListener('DOMContentLoaded', () => { 
-        // 1. Khởi tạo tab mặc định
         switchTab('tab-sales'); 
-        
-        // 2. Cài đặt ngày mặc định
         const dateEl = document.getElementById('cfDate');
         if(dateEl) dateEl.valueAsDate = new Date(); 
 
-        // 3. Gắn sự kiện (Listeners) SAU KHI HTML ĐÃ TẢI XONG
         document.getElementById('fileInput')?.addEventListener('change', handleFileImport);
         document.getElementById('cashflowForm')?.addEventListener('submit', handleCashflowSubmit);
         document.getElementById('addStaffForm')?.addEventListener('submit', handleAddStaff);
@@ -297,7 +309,6 @@
 
     // --- CHUYỂN TAB ---
     const switchTab = (tabId) => {
-        // Xử lý an toàn: Kiểm tra tab có tồn tại không trước khi thao tác
         const tabEl = document.getElementById(tabId);
         if(!tabEl) return; 
 
@@ -309,9 +320,11 @@
         const map = {'tab-sales':0, 'tab-cashflow':1, 'tab-customers':2, 'tab-staff':3, 'tab-inventory':4, 'tab-reports':5};
         if(map[tabId] !== undefined) document.querySelectorAll('.nav-item')[map[tabId]].classList.add('active');
         
-        // Tải dữ liệu mới nhất khi vào tab
         if(tabId === 'tab-sales') { populateStaffSelect(); updateProductDatalist('productListSales'); if(!editingOrderId) createOrderItemRow(); updateInvoicePreview(); }
-        if(tabId === 'tab-cashflow') renderCashflow();
+        if(tabId === 'tab-cashflow') {
+            renderCashflow();
+            updateOrderDatalist(); // CẬP NHẬT: Load danh sách đơn hàng vào datalist
+        }
         if(tabId === 'tab-customers') renderCrmSidebar();
         if(tabId === 'tab-staff') renderStaff();
         if(tabId === 'tab-inventory') { renderSuppliers(); populateSupplierSelect(); renderInventory(); updateProductDatalist('productListStock'); createStockRow(); }
@@ -319,7 +332,6 @@
     };
 
     // --- 1. LOGIC SAO LƯU & PHỤC HỒI ---
-    // Hàm này được gọi từ nút HTML onclick="exportData()" nên cần khai báo global
     const exportData = () => {
         try {
             const data = {};
@@ -450,6 +462,20 @@
     }
 
     // --- 3. LOGIC CÁC TAB KHÁC ---
+    
+    // CẬP NHẬT: HÀM TẠO DANH SÁCH GỢI Ý ĐƠN HÀNG
+    const updateOrderDatalist = () => {
+        const orders = loadData(KEYS.ORDERS);
+        const datalist = document.getElementById('orderListSuggestions');
+        if (datalist) {
+            // Sắp xếp đơn mới nhất lên đầu
+            const sortedOrders = orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+            datalist.innerHTML = sortedOrders.map(o => 
+                `<option value="${o.id}">Khách: ${o.customer.name} - ${formatCurrency(o.totalAmount)}</option>`
+            ).join('');
+        }
+    };
+
     // CRM
     const renderCrmSidebar = () => {
         const list = document.getElementById('crmCustomerList'); list.innerHTML = '';
