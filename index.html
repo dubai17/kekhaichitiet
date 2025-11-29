@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Trị Doanh Nghiệp PRO (v21.0)</title>
+    <style>
+        :root {
+            --primary-color: #007bff; --secondary-color: #6c757d; --success-color: #28a745;
+            --danger-color: #dc3545; --warning-color: #ffc107; --info-color: #17a2b8;
+            --light-bg: #f4f6f8; --white: #ffffff; --border-color: #dee2e6;
+        }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: #333; font-size: 14px; }
+        
+        /* HEADER & TABS */
+        .header { background-color: var(--primary-color); color: var(--white); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 20px; font-weight: 600; }
+        .nav-tabs { display: flex; background-color: var(--white); padding: 0 20px; border-bottom: 1px solid var(--border-color); overflow-x: auto; }
+        .nav-item { padding: 15px 20px; cursor: pointer; font-weight: 500; color: var(--secondary-color); border-bottom: 3px solid transparent; transition: all 0.3s; white-space: nowrap; }
+        .nav-item:hover { color: var(--primary-color); background-color: #f8f9fa; }
+        .nav-item.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); background-color: #eef7ff; }
+        .main-content { padding: 20px; max-width: 100%; margin: 0 auto; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* LAYOUTS */
+        .card { background: var(--white); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); }
+        .sales-layout { display: grid; grid-template-columns: 35% 63%; gap: 2%; }
+        .expense-layout { display: grid; grid-template-columns: 40% 58%; gap: 2%; }
+        .inventory-layout { display: grid; grid-template-columns: 40% 58%; gap: 2%; }
+        .crm-layout { display: grid; grid-template-columns: 30% 68%; gap: 2%; height: calc(100vh - 140px); }
+        
+        /* CHART STYLES (NEW v21) */
+        .chart-container {
+            display: flex;
+            align-items: flex-end; /* Căn đáy */
+            justify-content: space-around;
+            height: 250px;
+            padding-top: 30px;
+            border-bottom: 1px solid #ccc;
+            gap: 15px;
+        }
+        .chart-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            position: relative;
+            max-width: 80px;
+        }
+        .chart-bar {
+            width: 100%;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.8s ease;
+            min-height: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+        .chart-bar:hover { opacity: 0.85; }
+        .chart-value {
+            position: absolute;
+            top: -25px; 
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+        }
+        .chart-label {
+            margin-top: 8px;
+            font-size: 11px;
+            text-align: center;
+            color: #555;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.2;
+            height: 28px;
+        }
+
+        /* CRM STYLES */
+        .crm-sidebar { overflow-y: auto; border-right: 1px solid #eee; padding-right: 10px; }
+        .crm-detail { overflow-y: auto; padding-left: 10px; }
+        .cust-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
+        .cust-item:hover, .cust-item.active { background-color: #eef7ff; border-left: 3px solid var(--primary-color); }
+        .cust-name { font-weight: bold; font-size: 14px; }
+        .cust-phone { font-size: 12px; color: #666; }
+
+        /* FORM & BUTTONS */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+        .form-control { width: 100%; padding: 8px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
+        .form-control:focus { border-color: var(--primary-color); outline: none; }
+        .btn { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-success { background-color: var(--success-color); color: white; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-secondary { background-color: var(--secondary-color); color: white; }
+        .btn-warning { background-color: var(--warning-color); color: #333; }
+        .btn-info { background-color: var(--info-color); color: white; }
+        .btn-sm { padding: 4px 8px; font-size: 11px; }
+
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; }
+        th { background-color: #f1f3f5; padding: 10px; text-align: left; border-bottom: 2px solid var(--border-color); cursor: pointer; user-select: none;}
+        th:hover { background-color: #e2e6ea; }
+        td { padding: 10px; border-bottom: 1px solid var(--border-color); }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        /* INVOICE PREVIEW */
+        .invoice-box { background: #fff; padding: 30px; border: 1px solid #ccc; font-family: 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.4; color: #000; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .inv-title { text-align: center; text-transform: uppercase; font-weight: bold; font-size: 22px; margin-bottom: 5px; }
+        .inv-sub-title { text-align: center; font-style: italic; margin-bottom: 20px; font-size: 13px; }
+        .inv-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .inv-table th { background-color: #4472c4; color: white; text-align: center; border: 1px solid #ccc; padding: 5px; -webkit-print-color-adjust: exact; }
+        .inv-table td { border: 1px solid #ccc; padding: 5px; }
+        .inv-info-grid { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .inv-total-section { margin-top: 10px; display: flex; justify-content: flex-end; }
+        .inv-total-table { width: 50%; }
+        .inv-footer-grid { display: flex; justify-content: space-between; margin-top: 30px; text-align: center; }
+
+        /* DASHBOARD */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .kpi-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid #ccc; }
+        .kpi-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #666; text-transform: uppercase; }
+        .kpi-card .value { font-size: 24px; font-weight: bold; color: #333; }
+        .kpi-card.revenue { border-color: var(--primary-color); }
+        .kpi-card.cost { border-color: var(--warning-color); }
+        .kpi-card.expense { border-color: var(--danger-color); }
+        .kpi-card.profit { border-color: var(--success-color); }
+        
+        .progress-bar-container { width: 100%; background-color: #e9ecef; border-radius: 4px; height: 10px; margin-top: 5px; }
+        .progress-bar { height: 100%; border-radius: 4px; text-align: center; color: white; font-size: 11px; line-height: 20px; transition: width 0.5s; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        
+        .editable-input { width: 100%; padding: 4px; border: 1px solid #89c2ff; border-radius: 3px; }
+        #editModeBanner { background: #ffc107; color: #333; padding: 10px; text-align: center; font-weight: bold; margin-bottom: 15px; display: none; border-radius: 4px; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 800px; max-width: 90%; border-radius: 8px; position: relative; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 24px;">🏢</span>
+        <h1>Hệ Thống Quản Trị Doanh Nghiệp PRO</h1>
+    </div>
+    <div>
+        <button class="btn btn-secondary btn-sm" onclick="exportData()">💾 Sao Lưu</button>
+        <button class="btn btn-warning btn-sm" onclick="document.getElementById('fileInput').click()">📂 Phục Hồi</button>
+        <input type="file" id="fileInput" accept=".json" style="display:none;">
+    </div>
+</div>
+
+<div class="nav-tabs">
+    <div class="nav-item active" onclick="switchTab('tab-sales')">🛒 Bán Hàng</div>
+    <div class="nav-item" onclick="switchTab('tab-cashflow')">💸 Thu Chi</div>
+    <div class="nav-item" onclick="switchTab('tab-customers')">👥 Khách Hàng</div>
+    <div class="nav-item" onclick="switchTab('tab-staff')">🧑‍💼 Nhân Sự</div>
+    <div class="nav-item" onclick="switchTab('tab-inventory')">📦 Kho Hàng</div>
+    <div class="nav-item" onclick="switchTab('tab-reports')">📊 Báo Cáo</div>
+</div>
+
+<div class="main-content">
+
+    <div id="tab-sales" class="tab-pane active">
+        <div id="editModeBanner">⚠️ ĐANG SỬA ĐƠN HÀNG: <span id="editingOrderIDText"></span></div>
+        <div class="sales-layout">
+            <div>
+                <div class="card" id="salesCardInfo">
+                    <h5 style="margin:0 0 10px 0; color:var(--primary-color);">1. Thông tin Chung</h5>
+                    <div style="margin-bottom: 10px;"><select id="saleStaffSelect" class="form-control" onchange="updateInvoicePreview()"><option value="">-- Chọn sales --</option></select></div>
+                    <div style="display: grid; gap: 10px;">
+                        <input type="text" id="custPhone" class="form-control" placeholder="SĐT Khách (*)" onblur="findCustomerByPhone()" oninput="updateInvoicePreview()">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                            <input type="text" id="custName" class="form-control" placeholder="Tên khách" oninput="updateInvoicePreview()">
+                            <input type="text" id="custAddress" class="form-control" placeholder="Địa chỉ" oninput="updateInvoicePreview()">
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h5 style="margin:0 0 10px 0; color:var(--primary-color);">2. Chọn Hàng (Gõ tìm kiếm)</h5>
+                    <datalist id="productListSales"></datalist>
+                    <table id="orderItemsTable" style="margin-top:0;"><thead><tr><th style="width: 45%">Tên Hàng</th><th style="width: 15%">SL</th><th style="width: 25%">Đơn giá</th><th style="width: 15%"></th></tr></thead><tbody id="orderItemsBody"></tbody></table>
+                    <button class="btn btn-secondary btn-sm" style="width:100%; margin-top:5px;" onclick="createOrderItemRow()">➕ Thêm dòng</button>
+                </div>
+                <div class="card">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                         <div><label style="font-size:12px;">Phí Ship/Khác (+/-)</label><input type="number" id="shippingCost" class="form-control" value="0" oninput="updateInvoicePreview()"></div>
+                         <div><label style="font-size:12px;">Ghi chú</label><input type="text" id="orderNote" class="form-control" placeholder="..." oninput="updateInvoicePreview()"></div>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button id="btnSaveOrder" class="btn btn-primary" style="flex: 1; padding: 10px;" onclick="submitOrder()">✅ LƯU ĐƠN</button>
+                        <button id="btnCancelEdit" class="btn btn-secondary" style="display:none; padding: 10px;" onclick="cancelEditOrder()">❌ HỦY</button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="card" style="background: #ccc; padding: 20px; height: calc(100vh - 150px); overflow-y: auto;">
+                    <div id="invoicePreview" class="invoice-box">
+                        <div class="inv-title">PHIẾU XUẤT KHO BÁN HÀNG</div>
+                        <div class="inv-sub-title">Ngày: <span id="invDate">...</span><br>NV: <span id="invStaff" style="font-weight:bold">...</span> - SĐT: <span id="invStaffPhone">...</span></div>
+                        <div class="inv-info-grid"><div class="inv-info-left"><div>Khách: <span id="invCustName" style="font-weight:bold">...</span></div><div>SĐT: <span id="invCustPhone">...</span></div><div>ĐC: <span id="invCustAddr">...</span></div></div><div class="inv-info-right"><div style="font-weight:bold">SỐ: <span id="invID">...</span></div></div></div>
+                        <table class="inv-table"><thead><tr><th>STT</th><th>TÊN HÀNG</th><th>ĐVT</th><th>SL</th><th>ĐƠN GIÁ</th><th>THÀNH TIỀN</th></tr></thead><tbody id="invItemsList"></tbody></table>
+                        <div class="inv-total-section"><table class="inv-total-table"><tr><td>Cộng tiền hàng:</td><td><span id="invSubTotal">0</span></td></tr><tr><td>Phí Ship/Khác:</td><td><span id="invShip">0</span></td></tr><tr><td class="inv-total-label" style="color:#dc3545">Tổng thanh toán:</td><td class="inv-total-value"><span id="invTotal">0</span></td></tr></table></div>
+                        <div style="margin-top:10px;font-style:italic">Bằng chữ: <span id="invTotalText">...</span></div>
+                        <div class="inv-footer-grid"><div><strong>Người mua</strong><br><em>(Ký tên)</em></div><div><strong>Kế toán</strong><br><em>(Ký tên)</em></div><div><strong>Giám đốc</strong><br><em>(Ký tên)</em></div></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 15px;"><button class="btn btn-secondary" onclick="printInvoice()">🖨️ In Phiếu</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-cashflow" class="tab-pane">
+        <div class="expense-layout">
+            <div class="card"><h3 style="color: var(--primary-color);">📝 Lập Phiếu Thu / Chi</h3><form id="cashflowForm" class="form-grid" style="grid-template-columns: 1fr;"><div style="display:flex; gap:10px;"><div style="flex:1"><label>Loại phiếu:</label><select id="cfType" class="form-control" style="font-weight:bold;"><option value="THU" style="color:green">➕ PHIẾU THU</option><option value="CHI" style="color:red">➖ PHIẾU CHI</option></select></div><div style="flex:1"><label>Ngày:</label><input type="date" id="cfDate" class="form-control" required></div></div><div><label>Số tiền (VND):</label><input type="number" id="cfAmount" class="form-control" required min="0"></div><div><label>Đơn hàng liên quan (Mã PXK - Tùy chọn):</label><input type="text" id="cfOrderId" class="form-control" placeholder="VD: PXK..."></div><div><label>Hạng mục:</label><input type="text" id="cfCategory" class="form-control" list="catList" placeholder="VD: Tiền điện, Ship, Bán phế liệu..."><datalist id="catList"><option value="Tiền điện/nước"><option value="Lương nhân viên"><option value="Thuê mặt bằng"><option value="Phí Ship"><option value="Thu khác"></datalist></div><div><label>Ghi chú:</label><input type="text" id="cfNote" class="form-control"></div><button type="submit" class="btn btn-primary">💾 Lưu Phiếu</button></form></div>
+            <div class="card"><h3>📜 Lịch Sử Thu Chi</h3><div style="max-height: 400px; overflow-y: auto;"><table id="cashflowTable"><thead><tr><th>Ngày</th><th>Loại</th><th>Số tiền</th><th>Đơn hàng</th><th>Mục</th><th>Xóa</th></tr></thead><tbody></tbody></table></div></div>
+        </div>
+    </div>
+
+    <div id="tab-customers" class="tab-pane">
+        <div class="card" style="height: 100%;">
+            <div class="crm-layout">
+                <div class="crm-sidebar">
+                    <div style="position: sticky; top: 0; background: white; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                        <input type="text" id="crmSearch" class="form-control" placeholder="🔍 Tìm SĐT..." oninput="renderCrmSidebar()">
+                    </div>
+                    <div id="crmCustomerList"></div>
+                </div>
+                <div class="crm-detail" id="crmDetailView"><div style="text-align: center; color: #888; margin-top: 50px;"><h3>👈 Chọn khách hàng để xem</h3></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-staff" class="tab-pane">
+        <div class="card"><h3>Thêm Nhân Viên</h3><form id="addStaffForm" class="form-grid"><input type="text" id="staffName" class="form-control" required placeholder="Tên"><input type="text" id="staffPhone" class="form-control" placeholder="SĐT"><input type="text" id="staffAddress" class="form-control" placeholder="ĐC"><input type="text" id="staffNote" class="form-control" placeholder="Note"><button class="btn btn-success">➕ Thêm</button></form></div>
+        <div class="card"><h3>Danh Sách Sales</h3><table id="staffTable"><thead><tr><th>Tên</th><th>SĐT</th><th>ĐC</th><th>Note</th><th>Xóa</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <div id="tab-inventory" class="tab-pane">
+        <div class="inventory-layout">
+            <div class="card"><h3 style="color: var(--info-color);">🏭 Nhà Cung Cấp</h3><form id="addSupplierForm" class="form-grid" style="margin-bottom: 15px;"><input type="text" id="suppName" class="form-control" required placeholder="Tên NCC"><input type="text" id="suppPhone" class="form-control" placeholder="SĐT"><input type="text" id="suppAddr" class="form-control" placeholder="ĐC"><button type="submit" class="btn btn-info">➕ Thêm NCC</button></form><div style="max-height: 200px; overflow-y: auto; border: 1px solid #eee;"><table id="supplierTable" style="margin-top:0;"><thead><tr><th>Tên NCC</th><th>SĐT</th><th>Địa chỉ</th><th>Xóa</th></tr></thead><tbody></tbody></table></div></div>
+            <div class="card"><h3>📦 Nhập Hàng Mới</h3><div style="margin-bottom: 10px;"><label>Nhà Cung Cấp:</label><select id="stockSupplier" class="form-control" style="width: 50%; display: inline-block;"><option value="">-- Chọn NCC --</option></select></div><datalist id="productListStock"></datalist><table id="stockEntryTable" style="margin-bottom: 15px;"><thead><tr><th style="width: 35%">Tên SP (Gợi ý)</th><th style="width: 15%">SL</th><th style="width: 25%">Giá vốn</th><th style="width: 15%">Ghi chú</th><th style="width: 10%"></th></tr></thead><tbody id="stockEntryBody"></tbody></table><button class="btn btn-secondary btn-sm" onclick="createStockRow()">➕ Thêm dòng</button><button class="btn btn-success" style="float: right;" onclick="submitStockEntry()">✅ NHẬP KHO</button></div>
+        </div>
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center;"><h3>📊 Danh Sách Tồn Kho</h3><div><select id="filterSupplier" class="form-control" style="display:inline-block; width:150px;" onchange="renderInventory()"><option value="">Tất cả NCC</option></select><button class="btn btn-secondary btn-sm" onclick="sortInventory('stock')">🔽 Tồn nhiều</button><button class="btn btn-secondary btn-sm" onclick="sortInventory('sold')">🔽 Bán chạy</button></div></div>
+            <table id="inventoryTable"><thead><tr><th>Tên SP</th><th>NCC</th><th>Nhập</th><th>Bán</th><th>Tồn</th><th>Giá Vốn</th><th>Ghi chú</th><th>Xóa</th></tr></thead><tbody></tbody></table>
+        </div>
+    </div>
+
+    <div id="tab-reports" class="tab-pane">
+        <div class="filter-bar"><button id="btn-today" class="btn btn-secondary" onclick="filterReports('today')">Hôm nay</button><button id="btn-week" class="btn btn-secondary" onclick="filterReports('week')">Tuần này</button><button id="btn-month" class="btn btn-secondary" onclick="filterReports('month')">Tháng này</button><button id="btn-year" class="btn btn-secondary" onclick="filterReports('year')">Năm nay</button><button id="btn-all" class="btn btn-primary" onclick="filterReports('all')">Tất cả</button></div>
+        <div class="dashboard-grid"><div class="kpi-card revenue"><h3>DOANH THU (Đơn hàng)</h3><div class="value" id="kpiRevenue">0 ₫</div></div><div class="kpi-card cost"><h3>TỔNG VỐN NHẬP (Kho)</h3><div class="value" id="kpiTotalImport">0 ₫</div></div><div class="kpi-card expense"><h3>TỔNG CHI (Ngoài vốn)</h3><div class="value" id="kpiTotalExpense">0 ₫</div></div><div class="kpi-card profit"><h3>LỢI NHUẬN RÒNG</h3><div class="value" id="kpiNetProfit">0 ₫</div></div></div>
+        
+        <div class="sales-layout" style="margin-bottom: 20px;">
+            <div class="card">
+                <h4 style="border-bottom: 2px solid var(--primary-color); padding-bottom: 5px; color: var(--primary-color);">🏆 Top Sales (Doanh số)</h4>
+                <div id="chartTopSales"></div>
+            </div>
+            <div class="card">
+                <h4 style="border-bottom: 2px solid var(--success-color); padding-bottom: 5px; color: var(--success-color);">💎 Top Khách Hàng</h4>
+                <div id="chartTopCustomers"></div>
+            </div>
+        </div>
+
+        <div class="sales-layout">
+            <div class="card"><h4>📊 Bảng Cân Đối Tài Chính</h4><div style="margin-bottom:10px;"><span>Tỷ suất LN: <strong id="profitMargin">0%</strong></span><div class="progress-bar-container"><div id="barProfit" class="progress-bar" style="width:0%; background-color:var(--success-color);"></div></div></div><table class="table"><tr><td>(+) Doanh Thu Bán Hàng:</td><td class="text-right" id="rptRev">0</td></tr><tr><td>(-) Giá Vốn Hàng Bán:</td><td class="text-right" id="rptCOGS">0</td></tr><tr><td style="font-weight:bold;">= Lãi Gộp Đơn Hàng:</td><td class="text-right" style="font-weight:bold;" id="rptGrossProfit">0</td></tr><tr><td>(+) Thu Khác (Ngoài bán hàng):</td><td class="text-right" id="rptOtherInc" style="color:green">0</td></tr><tr><td>(-) Tổng Chi Phí (Vận hành + Đơn):</td><td class="text-right" id="rptOtherExp" style="color:red">0</td></tr><tr style="background:#eef7ff;"><td style="font-weight:bold;color:green;font-size:16px;">= Lợi Nhuận Ròng:</td><td class="text-right" style="font-weight:bold;color:green;font-size:16px;" id="rptNetProfit">0</td></tr></table></div>
+            <div class="card"><div style="display:flex; justify-content:space-between; align-items:center;"><h4>📜 Lịch Sử Đơn Hàng</h4><input type="text" id="searchOrderReport" class="form-control" style="width:150px;" placeholder="Tìm Mã ĐH..." oninput="searchOrderTable()"></div><div style="max-height: 400px; overflow-y:auto;"><table id="rptOrdersTable"><thead><tr><th>Khách hàng</th><th>Mã</th><th>Ngày</th><th>Doanh thu</th><th>Lãi thực</th><th>Thao tác</th></tr></thead><tbody></tbody></table></div></div>
+        </div>
+        <div class="card"><h4>💸 Chi Tiết Chi Phí</h4><div style="display:flex;gap:20px;"><div style="flex:1;"><h5>Chi phí Đơn hàng</h5><table id="rptOrderExpTable"><thead><tr><th>Mã ĐH</th><th>Số tiền</th><th>Lý do</th></tr></thead><tbody></tbody></table></div><div style="flex:1;"><h5>Chi phí Vận hành</h5><table id="rptGenExpTable"><thead><tr><th>Ngày</th><th>Loại</th><th>Số tiền</th></tr></thead><tbody></tbody></table></div></div></div>
+    </div>
+
+</div>
+
+<div id="invoiceModal" class="modal"><div class="modal-content"><span class="close" onclick="document.getElementById('invoiceModal').style.display='none'">&times;</span><div id="modalInvoiceContent"></div><div style="text-align: center; margin-top: 20px;"><button class="btn btn-secondary" onclick="printModalInvoice()">🖨️ In Phiếu</button></div></div></div>
+
+<script>
+    const KEYS = { STOCK: 'inventory_stock', ORDERS: 'daily_orders', CUSTOMERS: 'customer_list', STAFF: 'sales_staff', SUPPLIERS: 'suppliers_list', CASHFLOW: 'cashflow_data' };
+    const loadData = (key) => { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } };
+    const saveData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+    const formatCurrency = (n, short=false) => { 
+        if(short && n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+        if(short && n >= 1000) return (n/1000).toFixed(1) + 'k';
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n || 0);
+    };
+    const generateID = () => 'PXK' + Date.now().toString().slice(-8);
+    let editingOrderId = null;
+
+    document.addEventListener('DOMContentLoaded', () => { switchTab('tab-sales'); document.getElementById('cfDate').valueAsDate = new Date(); });
+
+    const switchTab = (tabId) => {
+        document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        const map = {'tab-sales':0, 'tab-cashflow':1, 'tab-customers':2, 'tab-staff':3, 'tab-inventory':4, 'tab-reports':5};
+        if(map[tabId] !== undefined) document.querySelectorAll('.nav-item')[map[tabId]].classList.add('active');
+        if(tabId === 'tab-sales') { populateStaffSelect(); updateProductDatalist('productListSales'); if(!editingOrderId) createOrderItemRow(); updateInvoicePreview(); }
+        if(tabId === 'tab-cashflow') renderCashflow();
+        if(tabId === 'tab-customers') renderCrmSidebar();
+        if(tabId === 'tab-staff') renderStaff();
+        if(tabId === 'tab-inventory') { renderSuppliers(); populateSupplierSelect(); renderInventory(); updateProductDatalist('productListStock'); createStockRow(); }
+        if(tabId === 'tab-reports') filterReports('today');
+    };
+
+    // --- CRM UPDATED (v19) ---
+    const renderCrmSidebar = () => {
+        const list = document.getElementById('crmCustomerList'); list.innerHTML = '';
+        const search = document.getElementById('crmSearch').value.toLowerCase();
+        let customers = loadData(KEYS.CUSTOMERS);
+        if(search) customers = customers.filter(c => c.phone.includes(search));
+        customers.forEach(c => {
+            const div = document.createElement('div'); div.className='cust-item';
+            div.innerHTML=`<div class="cust-name">${c.name}</div><div class="cust-phone">${c.phone}</div>`;
+            div.onclick=()=>showCrmDetail(c.phone); list.appendChild(div);
+        });
+    }
+    const showCrmDetail = (phone) => {
+        const c = loadData(KEYS.CUSTOMERS).find(x=>x.phone===phone);
+        const orders = loadData(KEYS.ORDERS).filter(o=>o.customer.phone===phone);
+        const total = orders.reduce((sum,o)=>sum+o.totalAmount,0);
+        document.getElementById('crmDetailView').innerHTML = `<div class="card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;"><h3 style="margin:0; color:var(--primary-color);">Thông Tin Khách Hàng</h3><button class="btn btn-danger btn-sm" onclick="deleteCustomerCRM('${phone}')">Xóa Khách Hàng</button></div><div class="form-grid" style="grid-template-columns: 1fr 1fr;"><div><label>Họ tên:</label><input type="text" class="form-control" value="${c.name}" onchange="updateCustomer('${phone}', 'name', this.value)"></div><div><label>Số điện thoại (ID):</label><input type="text" class="form-control" value="${c.phone}" disabled style="background:#eee;" title="Không thể sửa SĐT"></div><div style="grid-column: span 2;"><label>Địa chỉ:</label><input type="text" class="form-control" value="${c.address}" onchange="updateCustomer('${phone}', 'address', this.value)"></div><div style="grid-column: span 2;"><label>Ghi chú:</label><input type="text" class="form-control" value="${c.note || ''}" placeholder="Ghi chú..." onchange="updateCustomer('${phone}', 'note', this.value)"></div></div><div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;">Tổng mua: <strong style="color:var(--success-color); font-size:16px;">${formatCurrency(total)}</strong></div></div><div class="card"><h4>Lịch sử mua hàng (${orders.length} đơn)</h4><table><thead><tr><th>Mã</th><th>Ngày</th><th>Tiền</th><th>Xem</th></tr></thead><tbody>${orders.map(o=>`<tr><td>${o.id}</td><td>${new Date(o.date).toLocaleDateString('vi-VN')}</td><td>${formatCurrency(o.totalAmount)}</td><td><button class="btn btn-info btn-sm" onclick="viewOrderModal('${o.id}')">Xem PXK</button></td></tr>`).join('')}</tbody></table></div>`;
+    }
+    const updateCustomer = (phone, field, value) => { let customers = loadData(KEYS.CUSTOMERS); const index = customers.findIndex(c => c.phone === phone); if(index > -1) { customers[index][field] = value; saveData(KEYS.CUSTOMERS, customers); if(field === 'name') renderCrmSidebar(); } };
+    const deleteCustomerCRM = (phone) => { if(confirm('Xóa khách hàng này?')) { let customers = loadData(KEYS.CUSTOMERS).filter(c => c.phone !== phone); saveData(KEYS.CUSTOMERS, customers); renderCrmSidebar(); document.getElementById('crmDetailView').innerHTML = '<div style="text-align: center; color: #888; margin-top: 50px;"><h3>👈 Chọn khách hàng để xem</h3></div>'; } };
+    const viewOrderModal = (id) => { const o = loadData(KEYS.ORDERS).find(x=>x.id===id); if(!o)return; let staffPhone='...'; const s = loadData(KEYS.STAFF).find(st=>st.name===o.staff); if(s) staffPhone=s.phone; const html = `<div class="invoice-box" id="modalPrintArea"><div class="inv-title">PHIẾU XUẤT KHO BÁN HÀNG</div><div class="inv-sub-title">Ngày: ${new Date(o.date).toLocaleDateString('vi-VN')}<br>NV: ${o.staff || '...'} - SĐT: ${staffPhone}</div><div class="inv-info-grid"><div class="inv-info-left"><div>Khách: <strong>${o.customer.name}</strong></div><div>SĐT: ${o.customer.phone}</div><div>ĐC: ${o.customer.address}</div></div><div class="inv-info-right"><div style="font-weight:bold">SỐ: ${o.id}</div></div></div><table class="inv-table"><thead><tr><th>STT</th><th>TÊN HÀNG</th><th>ĐVT</th><th>SL</th><th>ĐƠN GIÁ</th><th>THÀNH TIỀN</th></tr></thead><tbody>${o.items.map((i,idx)=>`<tr><td class="text-center">${idx+1}</td><td>${i.name}</td><td class="text-center">Cái</td><td class="text-center">${i.quantity}</td><td class="text-right">${formatCurrency(i.price)}</td><td class="text-right">${formatCurrency(i.total)}</td></tr>`).join('')}</tbody></table><div class="inv-total-section"><table class="inv-total-table"><tr><td>Cộng tiền hàng:</td><td>${formatCurrency(o.totalAmount - (o.shipping||0))}</td></tr><tr><td>Phí Ship/Khác:</td><td>${formatCurrency(o.shipping||0)}</td></tr><tr><td class="inv-total-label" style="color:#dc3545">Tổng thanh toán:</td><td class="inv-total-value">${formatCurrency(o.totalAmount)}</td></tr></table></div><div class="inv-footer-grid"><div><strong>Người mua</strong><br><em>(Ký tên)</em></div><div><strong>Kế toán</strong><br><em>(Ký tên)</em></div><div><strong>Giám đốc</strong><br><em>(Ký tên)</em></div></div></div>`; document.getElementById('modalInvoiceContent').innerHTML = html; document.getElementById('invoiceModal').style.display='block'; }
+    const printModalInvoice = () => {const c=document.getElementById('modalPrintArea').innerHTML;const w=window.open('','','height=800,width=800');w.document.write('<html><head><title>IN</title><style>body{font-family:Times New Roman;padding:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #000;padding:5px}</style></head><body>'+c+'</body></html>');w.document.close();w.print();}
+
+    // --- SALES LOGIC ---
+    const updateProductDatalist = (el) => {const stock = loadData(KEYS.STOCK); const list = document.getElementById(el); if(list) list.innerHTML = stock.map(s => `<option value="${s.name}">Tồn: ${s.quantityIn - s.quantityOut} - Vốn: ${formatCurrency(s.costPrice)}</option>`).join('');}
+    const createOrderItemRow = (p='', q=1, pr=0) => {const tbody = document.getElementById('orderItemsBody'); const row = tbody.insertRow(); row.innerHTML = `<td><input type="text" class="form-control item-name" list="productListSales" value="${p}" placeholder="Gõ tên..." onchange="updateInvoicePreview()"></td><td><input type="number" class="form-control item-qty" value="${q}" oninput="updateInvoicePreview()"></td><td><input type="number" class="form-control item-price" value="${pr||''}" placeholder="0" oninput="updateInvoicePreview()"></td><td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove(); updateInvoicePreview()">x</button></td>`;};
+    const updateInvoicePreview = () => {
+        const id = editingOrderId || (document.getElementById('orderIDDisplay')?.value || generateID()); document.getElementById('invID').textContent = id; document.getElementById('invDate').textContent = new Date().toLocaleDateString('vi-VN');
+        const staffSel = document.getElementById('saleStaffSelect'); const staffName = staffSel.value; document.getElementById('invStaff').textContent = staffName || '...';
+        let staffPhone = '...'; if(staffName) { const s = loadData(KEYS.STAFF).find(x => x.name === staffName); if(s) staffPhone = s.phone; } document.getElementById('invStaffPhone').textContent = staffPhone;
+        document.getElementById('invCustName').textContent = document.getElementById('custName').value || '...'; document.getElementById('invCustPhone').textContent = document.getElementById('custPhone').value || '...'; document.getElementById('invCustAddr').textContent = document.getElementById('custAddress').value || '...';
+        let subTotal = 0, htmlRows = '', stt = 1; document.querySelectorAll('#orderItemsBody tr').forEach(row => { const name = row.querySelector('.item-name').value; const qty = parseFloat(row.querySelector('.item-qty').value)||0; const price = parseFloat(row.querySelector('.item-price').value)||0; const total = qty * price; if(name) { subTotal += total; htmlRows += `<tr><td class="text-center">${stt++}</td><td>${name}</td><td class="text-center">Cái</td><td class="text-center">${qty}</td><td class="text-right">${formatCurrency(price).replace('₫','')}</td><td class="text-right">${formatCurrency(total).replace('₫','')}</td></tr>`; } });
+        document.getElementById('invItemsList').innerHTML = htmlRows; document.getElementById('invSubTotal').textContent = formatCurrency(subTotal); const ship = parseFloat(document.getElementById('shippingCost').value)||0; document.getElementById('invShip').textContent = formatCurrency(ship); document.getElementById('invTotal').textContent = formatCurrency(subTotal+ship); document.getElementById('invTotalText').textContent = "(Bằng chữ)";
+    };
+    const submitOrder = () => {
+        const rows = document.querySelectorAll('#orderItemsBody tr'); let items = [], totalCost = 0, totalRev = 0; let stockData = loadData(KEYS.STOCK);
+        for(let row of rows) { const name = row.querySelector('.item-name').value; const qty = parseFloat(row.querySelector('.item-qty').value); const price = parseFloat(row.querySelector('.item-price').value); if(!name || qty <= 0) { alert('Kiểm tra lại SP!'); return; } const prod = stockData.find(s => s.name === name); if(prod) totalCost += (qty * prod.costPrice); items.push({name, quantity: qty, price}); totalRev += (qty * price); }
+        if(items.length===0) return; const ship = parseFloat(document.getElementById('shippingCost').value)||0;
+        const order = { id: document.getElementById('invID').textContent, date: new Date().toISOString(), customer: { name: document.getElementById('custName').value, phone: document.getElementById('custPhone').value, address: document.getElementById('custAddress').value }, staff: document.getElementById('saleStaffSelect').value, items, shipping: ship, totalAmount: totalRev + ship, cost: totalCost };
+        let orders = loadData(KEYS.ORDERS);
+        if(editingOrderId) { const old = orders.find(o => o.id === editingOrderId); old.items.forEach(i => { const p = stockData.find(s=>s.name===i.name); if(p) p.quantityOut -= i.quantity; }); items.forEach(i => { const p = stockData.find(s=>s.name===i.name); if(p) p.quantityOut += i.quantity; }); orders[orders.findIndex(o => o.id === editingOrderId)] = order; alert('Cập nhật xong!'); }
+        else { items.forEach(i => { const p = stockData.find(s=>s.name===i.name); if(p) p.quantityOut += i.quantity; }); if(order.customer.phone) { let custs = loadData(KEYS.CUSTOMERS); let c = custs.find(x=>x.phone===order.customer.phone); if(!c) custs.push({name:order.customer.name, phone:order.customer.phone, address:order.customer.address, note:''}); saveData(KEYS.CUSTOMERS, custs); } orders.push(order); alert('Lưu đơn mới!'); }
+        saveData(KEYS.STOCK, stockData); saveData(KEYS.ORDERS, orders); cancelEditOrder();
+    };
+    const startEditOrder = (id) => { const o = loadData(KEYS.ORDERS).find(x=>x.id===id); if(!o) return; switchTab('tab-sales'); editingOrderId = id; document.getElementById('editModeBanner').style.display='block'; document.getElementById('editingOrderIDText').textContent = id; document.getElementById('btnSaveOrder').textContent = "💾 CẬP NHẬT"; document.getElementById('btnSaveOrder').classList.replace('btn-primary','btn-warning'); document.getElementById('btnCancelEdit').style.display = 'inline-block'; document.getElementById('custPhone').value = o.customer.phone; document.getElementById('custName').value = o.customer.name; document.getElementById('custAddress').value = o.customer.address; document.getElementById('shippingCost').value = o.shipping; const sel = document.getElementById('saleStaffSelect'); sel.value = o.staff; document.getElementById('orderItemsBody').innerHTML=''; o.items.forEach(i=>createOrderItemRow(i.name, i.quantity, i.price)); updateInvoicePreview(); }
+    const cancelEditOrder = () => { editingOrderId = null; document.getElementById('editModeBanner').style.display='none'; document.getElementById('btnSaveOrder').textContent = "✅ LƯU ĐƠN"; document.getElementById('btnSaveOrder').classList.replace('btn-warning','btn-primary'); document.getElementById('btnCancelEdit').style.display='none'; document.getElementById('custPhone').value=''; document.getElementById('custName').value=''; document.getElementById('custAddress').value=''; document.getElementById('shippingCost').value=0; document.getElementById('orderItemsBody').innerHTML=''; createOrderItemRow(); updateInvoicePreview(); }
+    const renderCashflow = () => { const list = loadData(KEYS.CASHFLOW); const tbody = document.getElementById('cashflowTable').querySelector('tbody'); tbody.innerHTML = ''; list.forEach((item, index) => { const color = item.type === 'THU' ? 'green' : 'red'; tbody.innerHTML += `<tr><td>${new Date(item.date).toLocaleDateString('vi-VN')}</td><td style="font-weight:bold; color:${color}">${item.type}</td><td style="font-weight:bold; color:${color}">${formatCurrency(item.amount)}</td><td>${item.orderId || '-'}</td><td>${item.category}</td><td>${item.note || ''}</td><td><button class="btn btn-danger btn-sm" onclick="delCashflow(${index})">X</button></td></tr>`; }); };
+    document.getElementById('cashflowForm').addEventListener('submit', (e) => { e.preventDefault(); const data = { date: document.getElementById('cfDate').value, type: document.getElementById('cfType').value, amount: parseFloat(document.getElementById('cfAmount').value), orderId: document.getElementById('cfOrderId').value, category: document.getElementById('cfCategory').value, note: document.getElementById('cfNote').value }; let list = loadData(KEYS.CASHFLOW); list.push(data); saveData(KEYS.CASHFLOW, list); alert('Đã lưu phiếu!'); document.getElementById('cashflowForm').reset(); document.getElementById('cfDate').valueAsDate = new Date(); renderCashflow(); });
+    const delCashflow = (index) => { if(confirm('Xóa phiếu này?')) { let list = loadData(KEYS.CASHFLOW); list.splice(index, 1); saveData(KEYS.CASHFLOW, list); renderCashflow(); } };
+    const createStockRow = () => { const tbody = document.getElementById('stockEntryBody'); if(tbody.innerHTML.trim() === '' || event?.type === 'click') { const row = tbody.insertRow(); row.innerHTML = `<td><input type="text" class="form-control stock-name" list="productListStock" placeholder="Tên SP" onchange="fillStockInfo(this)"></td><td><input type="number" class="form-control stock-qty" min="1" value="1"></td><td><input type="number" class="form-control stock-cost" min="0" placeholder="0"></td><td><input type="text" class="form-control stock-note" placeholder="Ghi chú"></td><td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">x</button></td>`; } };
+    const fillStockInfo = (input) => { const name = input.value; const stock = loadData(KEYS.STOCK).find(s => s.name === name); if(stock) input.closest('tr').querySelector('.stock-cost').value = stock.costPrice; };
+    const submitStockEntry = () => { const supplier = document.getElementById('stockSupplier').value; if (!supplier) { alert('Chọn NCC!'); return; } const rows = document.querySelectorAll('#stockEntryBody tr'); let stock = loadData(KEYS.STOCK); let count = 0; rows.forEach(row => { const name = row.querySelector('.stock-name').value; const qty = parseInt(row.querySelector('.stock-qty').value); const cost = parseFloat(row.querySelector('.stock-cost').value); const note = row.querySelector('.stock-note').value; if(name && qty > 0) { let item = stock.find(s => s.name === name); if(item) { item.costPrice = ((item.quantityIn * item.costPrice) + (qty * cost)) / (item.quantityIn + qty); item.quantityIn += qty; item.supplier = supplier; item.note = note || item.note; } else { stock.push({name, quantityIn: qty, quantityOut: 0, costPrice: cost, supplier, note}); } count++; } }); if(count > 0) { saveData(KEYS.STOCK, stock); alert(`Nhập ${count} SP thành công!`); document.getElementById('stockEntryBody').innerHTML = ''; createStockRow(); renderInventory(); updateProductDatalist('productListStock'); } };
+    const renderInventory = () => { const filterSup = document.getElementById('filterSupplier')?.value; let stock = loadData(KEYS.STOCK); if(filterSup) stock = stock.filter(s => s.supplier === filterSup); const tbody = document.getElementById('inventoryTable').querySelector('tbody'); tbody.innerHTML = ''; stock.forEach((s, i) => { const avail = s.quantityIn - s.quantityOut; tbody.innerHTML += `<tr><td>${s.name}</td><td>${s.supplier||'-'}</td><td>${s.quantityIn}</td><td>${s.quantityOut}</td><td style="font-weight:bold; color:${avail<5?'red':'green'}">${avail}</td><td><input type="number" class="editable-input" value="${s.costPrice}" onchange="updateStockPrice(${i}, this.value)"></td><td>${s.note||''}</td><td><button class="btn btn-danger btn-sm" onclick="delItem(KEYS.STOCK, ${i}, 'renderInventory')">X</button></td></tr>`; }); };
+    const updateStockPrice = (idx, val) => { let s = loadData(KEYS.STOCK); s[idx].costPrice = parseFloat(val); saveData(KEYS.STOCK, s); };
+    const sortInventory = (type) => { let stock = loadData(KEYS.STOCK); if(type === 'stock') stock.sort((a,b) => (b.quantityIn - b.quantityOut) - (a.quantityIn - a.quantityOut)); if(type === 'sold') stock.sort((a,b) => b.quantityOut - a.quantityOut); const tbody = document.getElementById('inventoryTable').querySelector('tbody'); tbody.innerHTML = ''; stock.forEach((s) => { const avail = s.quantityIn - s.quantityOut; tbody.innerHTML += `<tr><td>${s.name}</td><td>${s.supplier}</td><td>${s.quantityIn}</td><td>${s.quantityOut}</td><td style="font-weight:bold">${avail}</td><td>${formatCurrency(s.costPrice)}</td><td>${s.note}</td><td>-</td></tr>`; }); };
+    
+    // --- REPORTS ---
+    const filterReports = (period) => {
+        ['btn-today','btn-week','btn-month','btn-year','btn-all'].forEach(id=>{ document.getElementById(id).classList.remove('btn-primary'); document.getElementById(id).classList.add('btn-secondary'); }); document.getElementById('btn-'+period).classList.remove('btn-secondary'); document.getElementById('btn-'+period).classList.add('btn-primary');
+        const now = new Date(); const startDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()); const startWeek = new Date(now.setDate(now.getDate() - now.getDay() + 1)); const startMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1); const startYear = new Date(new Date().getFullYear(), 0, 1);
+        const checkDate = (dStr) => { const d = new Date(dStr).getTime(); if(period==='all') return true; if(period==='today') return d >= startDay.getTime(); if(period==='week') return d >= startWeek.getTime(); if(period==='month') return d >= startMonth.getTime(); if(period==='year') return d >= startYear.getTime(); return false; };
+        const orders = loadData(KEYS.ORDERS).filter(o => checkDate(o.date)); const cashflow = loadData(KEYS.CASHFLOW).filter(c => checkDate(c.date));
+        
+        let totalRev = 0, totalCOGS = 0; orders.forEach(o => { totalRev += o.totalAmount; totalCOGS += (o.cost || 0); });
+        let otherIncome = 0, totalExpense = 0; cashflow.forEach(c => { if(c.type === 'THU') otherIncome += c.amount; else totalExpense += c.amount; });
+        const grossProfit = totalRev - totalCOGS; const netProfit = grossProfit + otherIncome - totalExpense;
+        
+        document.getElementById('kpiRevenue').textContent = formatCurrency(totalRev);
+        const stockData = loadData(KEYS.STOCK); const totalImport = stockData.reduce((sum, s) => sum + (s.quantityIn * s.costPrice), 0);
+        document.getElementById('kpiTotalImport').textContent = formatCurrency(totalImport); document.getElementById('kpiTotalExpense').textContent = formatCurrency(totalExpense); document.getElementById('kpiNetProfit').textContent = formatCurrency(netProfit); document.getElementById('kpiNetProfit').style.color = netProfit >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
+        document.getElementById('rptRev').textContent = formatCurrency(totalRev); document.getElementById('rptCOGS').textContent = formatCurrency(totalCOGS); document.getElementById('rptGrossProfit').textContent = formatCurrency(grossProfit); document.getElementById('rptOtherInc').textContent = formatCurrency(otherIncome); document.getElementById('rptOtherExp').textContent = formatCurrency(totalExpense); document.getElementById('rptNetProfit').textContent = formatCurrency(netProfit);
+        const margin = totalRev > 0 ? (netProfit / totalRev) * 100 : 0; document.getElementById('profitMargin').textContent = margin.toFixed(1) + '%'; document.getElementById('barProfit').style.width = Math.min(Math.max(margin, 0), 100) + '%';
+        const tb = document.getElementById('rptOrdersTable').querySelector('tbody'); tb.innerHTML = ''; orders.forEach(o => { const oNet = (o.totalAmount - (o.cost||0)); tb.innerHTML += `<tr><td>${o.customer.name}</td><td>${o.id}</td><td>${new Date(o.date).toLocaleDateString('vi-VN')}</td><td class="text-right">${formatCurrency(o.totalAmount)}</td><td class="text-right">${formatCurrency(oNet)}</td><td><button class="btn btn-warning btn-sm" onclick="startEditOrder('${o.id}')">Sửa</button> <button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">Hủy</button></td></tr>`; });
+
+        // --- NEW VERTICAL CHARTS LOGIC (v21) ---
+        const salesMap = {}; const staffList = loadData(KEYS.STAFF);
+        orders.forEach(o => { const name = o.staff || 'Chưa gán'; if(!salesMap[name]) salesMap[name] = 0; salesMap[name] += o.totalAmount; });
+        const sortedSales = Object.entries(salesMap).sort((a,b)=>b[1]-a[1]).slice(0, 5);
+        const maxSalesVal = sortedSales.length > 0 ? sortedSales[0][1] : 1; 
+        document.getElementById('chartTopSales').innerHTML = `<div class="chart-container">` + sortedSales.map(([name, val]) => { const percent = (val / maxSalesVal) * 100; return `<div class="chart-column"><div class="chart-bar" style="height:${percent}%; background-color:var(--primary-color)" title="${name}: ${formatCurrency(val)}"><div class="chart-value">${formatCurrency(val, true)}</div></div><div class="chart-label">${name}</div></div>`; }).join('') + `</div>` || '<p class="text-center">Chưa có dữ liệu</p>';
+
+        const custMap = {};
+        orders.forEach(o => { const phone = o.customer.phone || 'passerby'; if(!custMap[phone]) custMap[phone] = {name: o.customer.name, val:0}; custMap[phone].val += o.totalAmount; });
+        const sortedCust = Object.values(custMap).sort((a,b)=>b.val-a.val).slice(0, 5);
+        const maxCustVal = sortedCust.length > 0 ? sortedCust[0].val : 1;
+        document.getElementById('chartTopCustomers').innerHTML = `<div class="chart-container">` + sortedCust.map(c => { const percent = (c.val / maxCustVal) * 100; return `<div class="chart-column"><div class="chart-bar" style="height:${percent}%; background-color:var(--success-color)" title="${c.name}: ${formatCurrency(c.val)}"><div class="chart-value">${formatCurrency(c.val, true)}</div></div><div class="chart-label">${c.name}</div></div>`; }).join('') + `</div>` || '<p class="text-center">Chưa có dữ liệu</p>';
+    };
+
+    const searchOrderTable = () => { const term = document.getElementById('searchOrderReport').value.toLowerCase(); document.querySelectorAll('#rptOrdersTable tbody tr').forEach(r => { r.style.display = r.innerText.toLowerCase().includes(term) ? '' : 'none'; }); };
+    const delItem=(key,idx,renderFunc)=>{if(confirm('Xóa?')){let d=loadData(key);d.splice(idx,1);saveData(key,d);window[renderFunc]();}}
+    const renderSuppliers=()=>{const tb=document.getElementById('supplierTable').querySelector('tbody');tb.innerHTML='';loadData(KEYS.SUPPLIERS).forEach((s,i)=>{tb.innerHTML+=`<tr><td><input class="editable-input" value="${s.name}" onchange="updSupp(${i},'name',this.value)"></td><td>${s.phone||''}</td><td>${s.address||''}</td><td><button class="btn btn-danger btn-sm" onclick="delItem(KEYS.SUPPLIERS,${i},'renderSuppliers')">X</button></td></tr>`});}
+    const updSupp=(i,f,v)=>{let s=loadData(KEYS.SUPPLIERS);s[i][f]=v;saveData(KEYS.SUPPLIERS,s);populateSupplierSelect();}
+    const populateSupplierSelect=()=>{const sel=document.getElementById('stockSupplier');const filter=document.getElementById('filterSupplier'); let html='<option value="">-- Chọn NCC --</option>'; loadData(KEYS.SUPPLIERS).forEach(s=>{html+=`<option value="${s.name}">${s.name}</option>`}); sel.innerHTML=html; if(filter) filter.innerHTML='<option value="">Tất cả NCC</option>'+html;}
+    document.getElementById('addSupplierForm').addEventListener('submit',e=>{e.preventDefault();let s=loadData(KEYS.SUPPLIERS);s.push({name:document.getElementById('suppName').value,phone:document.getElementById('suppPhone').value,address:document.getElementById('suppAddr').value});saveData(KEYS.SUPPLIERS,s);e.target.reset();renderSuppliers();populateSupplierSelect();});
+    const renderStaff=()=>{const tb=document.getElementById('staffTable').querySelector('tbody');tb.innerHTML='';loadData(KEYS.STAFF).forEach((s,i)=>{tb.innerHTML+=`<tr><td>${s.name}</td><td>${s.phone}</td><td>${s.address}</td><td>${s.note||''}</td><td><button class="btn btn-danger btn-sm" onclick="delItem(KEYS.STAFF,${i},'renderStaff')">X</button></td></tr>`});}
+    document.getElementById('addStaffForm').addEventListener('submit',e=>{e.preventDefault();let s=loadData(KEYS.STAFF);s.push({name:document.getElementById('staffName').value,phone:document.getElementById('staffPhone').value,address:document.getElementById('staffAddress').value,note:document.getElementById('staffNote').value});saveData(KEYS.STAFF,s);e.target.reset();renderStaff();});
+    const populateStaffSelect=()=>{const sel=document.getElementById('saleStaffSelect');sel.innerHTML='<option value="">--Chọn Sales--</option>';loadData(KEYS.STAFF).forEach(s=>sel.innerHTML+=`<option value="${s.name}">${s.name}</option>`);}
+    const findCustomerByPhone=()=>{const p=document.getElementById('custPhone').value;const c=loadData(KEYS.CUSTOMERS).find(x=>x.phone===p);if(c){document.getElementById('custName').value=c.name;document.getElementById('custAddress').value=c.address;updateInvoicePreview();}}
+    const printInvoice=()=>{const c=document.getElementById('invoicePreview').innerHTML;const w=window.open('','','height=800,width=800');w.document.write('<html><head><title>IN</title><style>body{font-family:Times New Roman;padding:20px}.inv-table{width:100%;border-collapse:collapse;margin:20px 0}.inv-table th{border:1px solid #000;padding:5px}.inv-table td{border:1px solid #000;padding:5px}.inv-footer-grid{display:flex;justify-content:space-between;margin-top:30px;text-align:center}</style></head><body>'+c+'</body></html>');w.document.close();w.print();}
+    const deleteOrder = (id) => { if(!confirm('Hủy đơn và hoàn kho?')) return; let orders=loadData(KEYS.ORDERS); const idx=orders.findIndex(o=>o.id===id); if(idx===-1)return; let stock=loadData(KEYS.STOCK); orders[idx].items.forEach(i=>{let p=stock.find(s=>s.name===i.name); if(p)p.quantityOut-=i.quantity;}); orders.splice(idx,1); saveData(KEYS.STOCK,stock); saveData(KEYS.ORDERS,orders); alert('Đã hủy đơn'); filterReports('today'); };
+    document.getElementById('exportBtn').addEventListener('click', () => { const data={}; for(let k in KEYS) data[k]=loadData(KEYS[k]); const blob=new Blob([JSON.stringify(data)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='backup_pro.json'; a.click(); });
+    document.getElementById('fileInput').addEventListener('change', (e) => { const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=(ev)=>{ try{ const d=JSON.parse(ev.target.result); if(confirm('Phục hồi dữ liệu?')) { for(let k in KEYS) if(d[k]) saveData(KEYS[k], d[k]); location.reload(); } }catch(err){alert('Lỗi file!');} }; r.readAsText(f); });
+</script>
+</body>
+</html>
