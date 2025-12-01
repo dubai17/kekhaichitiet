@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Trị Doanh Nghiệp PRO (Final Fix CRM)</title>
+    <title>Hệ Thống Quản Trị Doanh Nghiệp PRO (Final Fixed)</title>
     <style>
         :root {
             --primary-color: #007bff; --secondary-color: #6c757d; --success-color: #28a745;
@@ -31,14 +31,6 @@
         .inventory-layout { display: grid; grid-template-columns: 40% 58%; gap: 2%; }
         .crm-layout { display: grid; grid-template-columns: 30% 68%; gap: 2%; height: calc(100vh - 140px); }
         
-        /* CHART STYLES */
-        .chart-container { display: flex; align-items: flex-end; justify-content: space-around; height: 250px; padding-top: 30px; border-bottom: 1px solid #ccc; gap: 15px; }
-        .chart-column { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; max-width: 80px; }
-        .chart-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.8s ease; min-height: 2px; position: relative; cursor: pointer; }
-        .chart-bar:hover { opacity: 0.85; }
-        .chart-value { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; color: #333; white-space: nowrap; }
-        .chart-label { margin-top: 8px; font-size: 11px; text-align: center; color: #555; word-wrap: break-word; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2; height: 28px; }
-
         /* CRM STYLES */
         .crm-sidebar { overflow-y: auto; border-right: 1px solid #eee; padding-right: 10px; }
         .crm-detail { overflow-y: auto; padding-left: 20px; }
@@ -49,10 +41,12 @@
         .cust-phone { font-size: 13px; color: #666; display: flex; align-items: center; gap: 5px;}
         
         /* CRM INFO BOX */
-        .crm-info-box { display: flex; gap: 20px; margin-bottom: 20px; }
-        .crm-stat-card { flex: 1; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #eee; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .crm-info-box { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        .crm-stat-card { flex: 1; min-width: 120px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #eee; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .crm-stat-card h4 { margin: 0 0 5px 0; font-size: 13px; color: #777; font-weight: normal; text-transform: uppercase; }
         .crm-stat-card div { font-size: 20px; font-weight: bold; color: var(--primary-color); }
+        .crm-stat-card.orange div { color: #fd7e14; }
+        .crm-stat-card.green div { color: #28a745; }
 
         /* FORM & BUTTONS */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
@@ -101,17 +95,17 @@
         .progress-bar { height: 100%; border-radius: 4px; text-align: center; color: white; font-size: 11px; line-height: 20px; transition: width 0.5s; }
         .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;}
         
-        /* Custom Date Range Style */
         .custom-filter-container { display: none; background: #fff; padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; gap: 10px; align-items: center; margin-left: 10px; }
         .custom-filter-container.active { display: flex; }
 
-        .editable-input { width: 100%; padding: 4px; border: 1px solid #89c2ff; border-radius: 3px; font-family: inherit; }
         #editModeBanner { background: #ffc107; color: #333; padding: 10px; text-align: center; font-weight: bold; margin-bottom: 15px; display: none; border-radius: 4px; }
         
         /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
         .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 800px; max-width: 90%; border-radius: 8px; position: relative; }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        
+        .editable-input { width: 100%; padding: 4px; border: 1px solid #89c2ff; border-radius: 3px; font-family: inherit; }
     </style>
 </head>
 <body>
@@ -119,7 +113,7 @@
 <div class="header">
     <div style="display: flex; align-items: center; gap: 10px;">
         <span style="font-size: 24px;">🏢</span>
-        <h1>Hệ Thống Quản Trị Doanh Nghiệp PRO</h1>
+        <h1>Hệ Thống Quản Trị Doanh Nghiệp PRO (Final Fixed)</h1>
     </div>
     <div>
         <button class="btn btn-secondary btn-sm" onclick="exportData()">💾 Sao Lưu</button>
@@ -168,8 +162,13 @@
                 <div class="card">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                          <div><label style="font-size:12px;">Phí Ship/Khác (+/-)</label><input type="number" id="shippingCost" class="form-control" value="0" oninput="updateInvoicePreview()"></div>
-                         <div><label style="font-size:12px;">Ghi chú</label><input type="text" id="orderNote" class="form-control" placeholder="..." oninput="updateInvoicePreview()"></div>
+                         <div><label style="font-size:12px;">Ghi chú (In phiếu)</label><input type="text" id="orderNote" class="form-control" placeholder="..." oninput="updateInvoicePreview()"></div>
                     </div>
+                    <div style="margin-top: 10px;">
+                        <label style="font-size:12px; color: var(--danger-color); font-weight: bold;">📝 Ghi chú nội bộ (Sales):</label>
+                        <input type="text" id="internalNote" class="form-control" style="border: 1px dashed var(--danger-color); background: #fff5f5;" placeholder="Thông tin này chỉ hiển thị nội bộ...">
+                    </div>
+                    
                     <div style="margin-top: 15px; display: flex; gap: 10px;">
                         <button id="btnSaveOrder" class="btn btn-primary" style="flex: 1; padding: 10px;" onclick="submitOrder()">✅ LƯU ĐƠN</button>
                         <button id="btnCancelEdit" class="btn btn-secondary" style="display:none; padding: 10px;" onclick="cancelEditOrder()">❌ HỦY</button>
@@ -185,6 +184,7 @@
                         <table class="inv-table"><thead><tr><th>STT</th><th>TÊN HÀNG</th><th>ĐVT</th><th>SL</th><th>ĐƠN GIÁ</th><th>THÀNH TIỀN</th></tr></thead><tbody id="invItemsList"></tbody></table>
                         <div class="inv-total-section"><table class="inv-total-table"><tr><td>Cộng tiền hàng:</td><td><span id="invSubTotal">0</span></td></tr><tr><td>Phí Ship/Khác:</td><td><span id="invShip">0</span></td></tr><tr><td class="inv-total-label" style="color:#dc3545">Tổng thanh toán:</td><td class="inv-total-value"><span id="invTotal">0</span></td></tr></table></div>
                         <div style="margin-top:10px;font-style:italic">Bằng chữ: <span id="invTotalText">...</span></div>
+                        <div style="margin-top:10px; border-top:1px dotted #999; padding-top:5px; font-size: 13px;">Ghi chú: <span id="invNoteText">...</span></div>
                         <div class="inv-footer-grid"><div><strong>Người mua</strong><br><em>(Ký tên)</em></div><div><strong>Kế toán</strong><br><em>(Ký tên)</em></div><div><strong>Giám đốc</strong><br><em>(Ký tên)</em></div></div>
                     </div>
                     <div style="text-align: center; margin-top: 15px;"><button class="btn btn-secondary" onclick="printInvoice()">🖨️ In Phiếu</button></div>
@@ -286,7 +286,7 @@
                     <button class="btn btn-secondary btn-sm" onclick="sortInventory('sold')">🔽 Bán chạy</button>
                 </div>
             </div>
-            <table id="inventoryTable"><thead><tr><th>Tên SP</th><th>NCC</th><th>Nhập</th><th>Bán</th><th>Tồn</th><th>Giá Vốn</th><th>Ghi chú</th><th>Xóa</th></tr></thead><tbody></tbody></table>
+            <table id="inventoryTable"><thead><tr><th>Tên SP</th><th>Nhập</th><th>Bán</th><th>Tồn</th><th>Giá Vốn</th><th>Ghi chú</th><th>Hành động</th></tr></thead><tbody></tbody></table>
         </div>
     </div>
 
@@ -309,7 +309,7 @@
             </div>
         </div>
 
-        <div class="dashboard-grid"><div class="kpi-card revenue"><h3>DOANH THU (Đơn hàng)</h3><div class="value" id="kpiRevenue">0 ₫</div></div><div class="kpi-card cost"><h3>TỔNG VỐN NHẬP (Kho)</h3><div class="value" id="kpiTotalImport">0 ₫</div></div><div class="kpi-card expense"><h3>TỔNG CHI (Ngoài vốn)</h3><div class="value" id="kpiTotalExpense">0 ₫</div></div><div class="kpi-card profit"><h3>LỢI NHUẬN RÒNG</h3><div class="value" id="kpiNetProfit">0 ₫</div></div></div>
+        <div class="dashboard-grid"><div class="kpi-card revenue"><h3>DOANH THU (Đơn hàng)</h3><div class="value" id="kpiRevenue">0 ₫</div></div><div class="kpi-card cost"><h3>TỔNG VỐN NHẬP (Kho)</h3><div class="value" id="kpiTotalImport">0 ₫</div></div><div class="kpi-card expense"><h3>TỔNG CHI (Vận hành)</h3><div class="value" id="kpiTotalExpense">0 ₫</div></div><div class="kpi-card profit"><h3>LỢI NHUẬN RÒNG</h3><div class="value" id="kpiNetProfit">0 ₫</div></div></div>
         
         <div class="sales-layout" style="margin-bottom: 20px;">
             <div class="card">
@@ -323,10 +323,31 @@
         </div>
 
         <div class="sales-layout">
-            <div class="card"><h4>📊 Bảng Cân Đối Tài Chính</h4><div style="margin-bottom:10px;"><span>Tỷ suất LN: <strong id="profitMargin">0%</strong></span><div class="progress-bar-container"><div id="barProfit" class="progress-bar" style="width:0%; background-color:var(--success-color);"></div></div></div><table class="table"><tr><td>(+) Doanh Thu Bán Hàng:</td><td class="text-right" id="rptRev">0</td></tr><tr><td>(-) Giá Vốn Hàng Bán:</td><td class="text-right" id="rptCOGS">0</td></tr><tr><td style="font-weight:bold;">= Lãi Gộp Đơn Hàng:</td><td class="text-right" style="font-weight:bold;" id="rptGrossProfit">0</td></tr><tr><td>(+) Thu Khác (Ngoài bán hàng):</td><td class="text-right" id="rptOtherInc" style="color:green">0</td></tr><tr><td>(-) Tổng Chi Phí (Vận hành + Đơn):</td><td class="text-right" id="rptOtherExp" style="color:red">0</td></tr><tr style="background:#eef7ff;"><td style="font-weight:bold;color:green;font-size:16px;">= Lợi Nhuận Ròng:</td><td class="text-right" style="font-weight:bold;color:green;font-size:16px;" id="rptNetProfit">0</td></tr></table></div>
-            <div class="card"><div style="display:flex; justify-content:space-between; align-items:center;"><h4>📜 Lịch Sử Đơn Hàng</h4><input type="text" id="searchOrderReport" class="form-control" style="width:150px;" placeholder="Tìm Mã ĐH..." oninput="searchOrderTable()"></div><div style="max-height: 400px; overflow-y:auto;"><table id="rptOrdersTable"><thead><tr><th>Khách hàng</th><th>Mã</th><th>Ngày</th><th>Doanh thu</th><th>Lãi thực</th><th>Thao tác</th></tr></thead><tbody></tbody></table></div></div>
+            <div class="card">
+                <h4>📊 Bảng Cân Đối Tài Chính</h4>
+                <div style="margin-bottom:10px;"><span>Tỷ suất LN: <strong id="profitMargin">0%</strong></span><div class="progress-bar-container"><div id="barProfit" class="progress-bar" style="width:0%; background-color:var(--success-color);"></div></div></div>
+                <table class="table">
+                    <tr><td>(+) Doanh Thu Bán Hàng:</td><td class="text-right" id="rptRev">0</td></tr>
+                    <tr><td>(-) Giá Vốn Hàng Bán:</td><td class="text-right" id="rptCOGS">0</td></tr>
+                    <tr><td>(-) Tổng Chi Phí Đơn Hàng (Ship/Khác):</td><td class="text-right" id="rptOrderCost">0</td></tr>
+                    <tr><td style="font-weight:bold;">= Lợi Nhuận (Gộp):</td><td class="text-right" style="font-weight:bold;" id="rptGrossProfit">0</td></tr>
+                    <tr><td>(-) Tổng Chi Phí Vận Hành (Ngoài đơn):</td><td class="text-right" id="rptOpExp" style="color:red">0</td></tr>
+                    <tr><td>(+) Thu Khác (Ngoài bán hàng):</td><td class="text-right" id="rptOtherInc" style="color:green">0</td></tr>
+                    <tr style="background:#eef7ff;"><td style="font-weight:bold;color:green;font-size:16px;">= Lợi Nhuận Ròng:</td><td class="text-right" style="font-weight:bold;color:green;font-size:16px;" id="rptNetProfit">0</td></tr>
+                </table>
+            </div>
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;"><h4>📜 Lịch Sử Đơn Hàng</h4><input type="text" id="searchOrderReport" class="form-control" style="width:150px;" placeholder="Tìm Mã ĐH..." oninput="searchOrderTable()"></div>
+                <div style="max-height: 400px; overflow-y:auto;"><table id="rptOrdersTable"><thead><tr><th>Khách hàng</th><th>Mã</th><th>Ngày</th><th>Ghi chú nội bộ</th><th>Doanh thu</th><th>Lãi thực</th><th>Thao tác</th></tr></thead><tbody></tbody></table></div>
+            </div>
         </div>
-        <div class="card"><h4>💸 Chi Tiết Chi Phí</h4><div style="display:flex;gap:20px;"><div style="flex:1;"><h5>Chi phí Đơn hàng</h5><table id="rptOrderExpTable"><thead><tr><th>Mã ĐH</th><th>Số tiền</th><th>Lý do</th></tr></thead><tbody></tbody></table></div><div style="flex:1;"><h5>Chi phí Vận hành</h5><table id="rptGenExpTable"><thead><tr><th>Ngày</th><th>Loại</th><th>Số tiền</th></tr></thead><tbody></tbody></table></div></div></div>
+        <div class="card">
+            <h4>💸 Chi Tiết Chi Phí</h4>
+            <div style="display:flex;gap:20px;">
+                <div style="flex:1;"><h5>Chi phí Đơn hàng (Ship, Phí khác)</h5><table id="rptOrderExpTable"><thead><tr><th>Mã ĐH</th><th>Số tiền</th><th>Lý do</th></tr></thead><tbody></tbody></table></div>
+                <div style="flex:1;"><h5>Chi phí Vận hành (Điện, Nước, Lương...)</h5><table id="rptGenExpTable"><thead><tr><th>Ngày</th><th>Loại</th><th>Số tiền</th></tr></thead><tbody></tbody></table></div>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -348,9 +369,22 @@
         if(short && n >= 1000) return (n/1000).toFixed(1) + 'k';
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n || 0);
     };
-    const generateID = () => 'PXK' + Date.now().toString().slice(-8);
+    // Hàm chuẩn hóa chuỗi để so sánh không phân biệt hoa thường
+    const normalizeStr = (str) => String(str).trim().toLowerCase();
+    
+    // --- TẠO ID MỚI: PXK + Tháng + Năm (2 số) + Chữ + 9 Số ---
+    const generateID = () => {
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = String(now.getFullYear()).slice(-2); // Lấy 2 số cuối năm
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
+        const randomNum = Math.floor(Math.random() * 1000000000).toString().padStart(9, '0'); // 9 số
+        return `PXK${month}${year}${randomChar}${randomNum}`;
+    };
     
     let editingOrderId = null;
+    let currentReportPeriod = 'today';
 
     // --- KHỞI TẠO ---
     document.addEventListener('DOMContentLoaded', () => { 
@@ -383,270 +417,373 @@
 
     // --- GOOGLE SHEETS SYNC ---
     const syncWithGoogleSheets = async () => {
-        if(GOOGLE_SCRIPT_URL.includes('THAY_LINK')) {
-            alert('Bạn chưa cấu hình link Google Apps Script trong code!');
-            return;
-        }
-        if(!confirm('Hành động này sẽ nhập thêm hàng từ Google Sheets vào kho hiện tại. Tiếp tục?')) return;
+        if(GOOGLE_SCRIPT_URL.includes('THAY_LINK')) { alert('Bạn chưa cấu hình link Google Apps Script!'); return; }
+        if(!confirm('Nhập thêm hàng từ Google Sheets?')) return;
         try {
-            const btn = event.target; const oldText = btn.textContent;
-            btn.textContent = "⏳ Đang tải..."; btn.disabled = true;
+            const btn = event.target; btn.textContent = "⏳..."; btn.disabled = true;
             const response = await fetch(GOOGLE_SCRIPT_URL);
             const data = await response.json();
             let stock = loadData(KEYS.STOCK); let count = 0;
             data.forEach(item => {
                 if(item.name && item.qty > 0) {
-                    let exist = stock.find(s => s.name === item.name && parseFloat(s.costPrice) === parseFloat(item.cost));
-                    if(exist) { exist.quantityIn += parseInt(item.qty); if(item.supplier) exist.supplier = item.supplier; } 
+                    let exist = stock.find(s => normalizeStr(s.name) === normalizeStr(item.name) && parseFloat(s.costPrice) === parseFloat(item.cost));
+                    if(exist) { exist.quantityIn += parseInt(item.qty); } 
                     else { stock.push({ name: item.name, quantityIn: parseInt(item.qty), quantityOut: 0, costPrice: parseFloat(item.cost), supplier: item.supplier || '', note: 'Nhập từ Sheets' }); }
                     count++;
                 }
             });
             saveData(KEYS.STOCK, stock); renderInventory(); updateProductDatalist('productListStock');
-            alert(`Đã đồng bộ thành công ${count} dòng dữ liệu từ Sheet!`);
-            btn.textContent = oldText; btn.disabled = false;
-        } catch (error) { console.error(error); alert('Lỗi kết nối Google Sheets!'); event.target.textContent = "☁️ Đồng bộ từ Sheet"; event.target.disabled = false; }
+            alert(`Đã đồng bộ ${count} dòng!`); btn.textContent = "☁️ Đồng bộ từ Sheet"; btn.disabled = false;
+        } catch (error) { console.error(error); alert('Lỗi kết nối!'); event.target.textContent = "☁️ Đồng bộ từ Sheet"; event.target.disabled = false; }
     };
 
-    // --- LOGIC CRM (KHÁCH HÀNG) ---
+    // --- LOGIC CRM ---
     const renderCrmSidebar = () => {
         const listDiv = document.getElementById('crmCustomerList');
-        const term = document.getElementById('crmSearch').value.toLowerCase().trim();
+        const term = normalizeStr(document.getElementById('crmSearch').value);
         let customers = loadData(KEYS.CUSTOMERS);
-        
-        if (term) customers = customers.filter(c => c.phone.includes(term) || c.name.toLowerCase().includes(term));
-        
-        if(customers.length === 0) { 
-            listDiv.innerHTML = '<div style="padding:15px;text-align:center;color:#999">Chưa có khách hàng</div>'; 
-            return; 
-        }
-        
-        // Sắp xếp khách hàng mới lên đầu
+        if (term) customers = customers.filter(c => c.phone.includes(term) || normalizeStr(c.name).includes(term));
+        if(customers.length === 0) { listDiv.innerHTML = '<div style="padding:15px;text-align:center;color:#999">Chưa có khách hàng</div>'; return; }
         customers.reverse();
-
-        listDiv.innerHTML = customers.map(c => `
-            <div class="cust-item" onclick="viewCustomerDetail('${c.phone}')">
-                <div class="cust-name">${c.name}</div>
-                <div class="cust-phone">
-                    <span style="color:#666">📱 ${c.phone}</span>
-                </div>
-            </div>
-        `).join('');
+        listDiv.innerHTML = customers.map(c => `<div class="cust-item" onclick="viewCustomerDetail('${c.phone}')"><div class="cust-name">${c.name}</div><div class="cust-phone"><span style="color:#666">📱 ${c.phone}</span></div></div>`).join('');
     };
 
     const viewCustomerDetail = (phone) => {
-        // 1. Tìm thông tin khách
-        const customers = loadData(KEYS.CUSTOMERS); 
-        const customer = customers.find(c => c.phone === phone); 
-        if (!customer) {
-            console.error("Không tìm thấy khách hàng với SĐT:", phone);
-            return;
-        }
-
-        // Highlight giao diện bên trái
-        document.querySelectorAll('.cust-item').forEach(el => el.classList.remove('active')); 
-        event.currentTarget.classList.add('active');
-        
-        // 2. Lấy dữ liệu đơn hàng của khách
-        const allOrders = loadData(KEYS.ORDERS);
-        // Lọc đơn hàng có sdt trùng khớp (trim để đảm bảo không lỗi khoảng trắng)
-        const orders = allOrders.filter(o => o.customer.phone.trim() === phone.trim());
-        
-        // Sắp xếp đơn mới nhất lên đầu
-        orders.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+        const customers = loadData(KEYS.CUSTOMERS); const customer = customers.find(c => String(c.phone).trim() === String(phone).trim()); if (!customer) return;
+        document.querySelectorAll('.cust-item').forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active');
+        const orders = loadData(KEYS.ORDERS).filter(o => String(o.customer.phone).trim() === String(phone).trim()).sort((a, b) => new Date(b.date) - new Date(a.date));
         const totalSpent = orders.reduce((sum, o) => sum + o.totalAmount, 0);
-
-        // 3. Render giao diện chi tiết bên phải
-        const detailDiv = document.getElementById('crmDetailView');
-        detailDiv.innerHTML = `
+        document.getElementById('crmDetailView').innerHTML = `
             <div class="card" style="border-top: 5px solid var(--primary-color);">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start">
-                    <div>
-                        <h2 style="margin:0; color: #333">${customer.name}</h2>
-                        <div style="color:#666; margin-top:5px; font-size: 14px;">
-                            <div>📍 Địa chỉ: <strong>${customer.address || 'Chưa cập nhật'}</strong></div>
-                            <div>📞 Điện thoại: <strong>${customer.phone}</strong></div>
-                        </div>
-                    </div>
-                    <div style="text-align:right">
-                        <button class="btn btn-warning btn-sm" onclick="startOrderForCustomer('${customer.phone}', '${customer.name}', '${customer.address}')">🛒 Tạo đơn mới</button>
-                    </div>
-                </div>
-
-                <hr style="border:0; border-top:1px solid #eee; margin: 15px 0;">
-
-                <div class="crm-info-box">
-                    <div class="crm-stat-card">
-                        <h4>Tổng Chi Tiêu</h4>
-                        <div>${formatCurrency(totalSpent)}</div>
-                    </div>
-                    <div class="crm-stat-card">
-                        <h4>Số Đơn Hàng</h4>
-                        <div style="color:var(--info-color)">${orders.length}</div>
-                    </div>
-                    <div class="crm-stat-card">
-                        <h4>Lần Cuối Mua</h4>
-                        <div style="color:#666; font-size:16px; margin-top:3px;">${orders.length > 0 ? new Date(orders[0].date).toLocaleDateString('vi-VN') : 'Chưa mua'}</div>
-                    </div>
-                </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start"><div><h2 style="margin:0;">${customer.name}</h2><div>📍 ${customer.address||'---'} | 📞 ${customer.phone}</div></div>
+                <button class="btn btn-warning btn-sm" onclick="startOrderForCustomer('${customer.phone}', '${customer.name}', '${customer.address}')">🛒 Tạo đơn mới</button></div>
+                <hr style="margin:20px 0;"><div class="crm-info-box"><div class="crm-stat-card orange"><h4>Tổng Mua</h4><div>${formatCurrency(totalSpent)}</div></div><div class="crm-stat-card green"><h4>Số Đơn</h4><div>${orders.length}</div></div></div>
             </div>
-
-            <h4 style="margin: 20px 0 10px 0; color: var(--primary-color);">📜 Lịch sử mua hàng</h4>
-            <div class="card">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Mã ĐH</th>
-                            <th>Ngày mua</th>
-                            <th>Sản phẩm</th>
-                            <th class="text-right">Tổng tiền</th>
-                            <th class="text-center">Chi tiết</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${orders.length > 0 ? orders.map(o => {
-                            // Tóm tắt tên sản phẩm
-                            const summary = o.items.map(i => `${i.name.split('{')[0]} (x${i.quantity})`).join(', ');
-                            return `
-                                <tr>
-                                    <td><span style="font-weight:bold; color:var(--primary-color)">${o.id}</span></td>
-                                    <td>${new Date(o.date).toLocaleDateString('vi-VN')}</td>
-                                    <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis" title="${summary}">${summary}</td>
-                                    <td class="text-right" style="font-weight:bold">${formatCurrency(o.totalAmount)}</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-secondary btn-sm" onclick="startEditOrder('${o.id}')">Xem/Sửa</button>
-                                    </td>
-                                </tr>
-                            `;
-                        }).join('') : '<tr><td colspan="5" class="text-center" style="padding:20px; color:#999">Chưa có đơn hàng nào được ghi nhận.</td></tr>'}
-                    </tbody>
-                </table>
-            </div>
-        `;
+            <h4 style="color:var(--primary-color);">📜 Lịch sử giao dịch</h4>
+            <div class="card"><table class="table"><thead><tr><th>Mã ĐH</th><th>Ngày</th><th>Sản phẩm</th><th>Ghi chú NB</th><th>Giá trị</th><th>Sửa</th></tr></thead><tbody>
+                ${orders.length > 0 ? orders.map(o => `<tr><td><b>${o.id}</b></td><td>${new Date(o.date).toLocaleDateString('vi-VN')}</td><td>${o.items.map(i=>`${i.name.split('{')[0]}(x${i.quantity})`).join(', ')}</td><td style="color:red;font-style:italic">${o.internalNote||''}</td><td class="text-right">${formatCurrency(o.totalAmount)}</td><td class="text-center"><button class="btn btn-secondary btn-sm" onclick="startEditOrder('${o.id}')">✏️</button></td></tr>`).join('') : '<tr><td colspan="6" class="text-center">Chưa có đơn hàng.</td></tr>'}
+            </tbody></table></div>`;
     };
     
-    // Hàm phụ trợ: Nhảy sang tab bán hàng và điền sẵn thông tin khách
-    const startOrderForCustomer = (phone, name, addr) => {
-        switchTab('tab-sales');
-        document.getElementById('custPhone').value = phone;
-        document.getElementById('custName').value = name;
-        document.getElementById('custAddress').value = addr || '';
-        updateInvoicePreview();
-    };
+    const startOrderForCustomer = (phone, name, addr) => { switchTab('tab-sales'); document.getElementById('custPhone').value = phone; document.getElementById('custName').value = name; document.getElementById('custAddress').value = addr || ''; updateInvoicePreview(); };
 
-    // --- LOGIC BÁN HÀNG & LƯU ĐƠN (UPDATED) ---
+    // --- LOGIC BÁN HÀNG (FIXED COGS) ---
     const submitOrder = () => {
         const rows = document.querySelectorAll('#orderItemsBody tr');
         let items = [], totalCost = 0, totalRev = 0; let stockData = loadData(KEYS.STOCK);
+        
         for(let row of rows) { 
             const inputName = row.querySelector('.item-name').value; 
             const qty = parseFloat(row.querySelector('.item-qty').value); 
             const price = parseFloat(row.querySelector('.item-price').value); 
-            if(!inputName || qty <= 0) { alert('Kiểm tra lại tên SP hoặc Số lượng!'); return; } 
-            const prod = stockData.find(s => `${s.name} {V:${s.costPrice}}` === inputName);
-            if(prod) { totalCost += (qty * prod.costPrice); } 
-            items.push({name: inputName, quantity: qty, price}); totalRev += (qty * price); 
+            if(!inputName || qty <= 0) { alert('Kiểm tra tên SP hoặc Số lượng!'); return; } 
+            
+            // Tìm sản phẩm trong kho (Case Insensitive)
+            // Tách tên hiển thị trong datalist để lấy tên gốc so sánh
+            const rawNameOnly = inputName.split(' {V:')[0];
+            const prod = stockData.find(s => normalizeStr(s.name) === normalizeStr(rawNameOnly));
+            
+            let currentCost = 0;
+            if(prod) { 
+                currentCost = prod.costPrice;
+                totalCost += (qty * currentCost); 
+            } else {
+                // Nếu không tìm thấy trong kho (bán âm), tạm tính giá vốn = 0 hoặc cảnh báo
+                // Ở đây cho phép bán nhưng giá vốn = 0 (Lợi nhuận ảo cao)
+            }
+
+            // LƯU CỨNG COST PRICE VÀO ITEM
+            items.push({
+                name: rawNameOnly, // Lưu tên sạch
+                fullName: inputName, // Lưu tên full để hiển thị lại
+                quantity: qty, 
+                price: price,
+                costPrice: currentCost // Quan trọng: Lưu giá vốn tại thời điểm bán
+            }); 
+            totalRev += (qty * price); 
         }
+        
         if(items.length === 0) return; 
         const ship = parseFloat(document.getElementById('shippingCost').value)||0;
+        const note = document.getElementById('orderNote').value;
+        const internalNote = document.getElementById('internalNote').value;
         const custName = document.getElementById('custName').value.trim();
         const custPhone = document.getElementById('custPhone').value.trim();
         const custAddr = document.getElementById('custAddress').value.trim();
-        const staffName = document.getElementById('saleStaffSelect').value;
-        if(!custPhone) { alert("Vui lòng nhập SĐT Khách hàng!"); return; }
-        const selectedDate = document.getElementById('orderDate').value;
-        const orderDate = selectedDate ? new Date(selectedDate).toISOString() : new Date().toISOString();
-        const order = { id: document.getElementById('invID').textContent, date: orderDate, customer: { name: custName, phone: custPhone, address: custAddr }, staff: staffName, items, shipping: ship, totalAmount: totalRev + ship, cost: totalCost };
+        if(!custPhone) { alert("Nhập SĐT Khách hàng!"); return; }
+        const orderDate = document.getElementById('orderDate').value ? new Date(document.getElementById('orderDate').value).toISOString() : new Date().toISOString();
+        
+        const order = { 
+            id: document.getElementById('invID').textContent, 
+            date: orderDate, 
+            customer: { name: custName, phone: custPhone, address: custAddr }, 
+            staff: document.getElementById('saleStaffSelect').value, 
+            items: items, 
+            shipping: ship, 
+            note: note, 
+            internalNote: internalNote, 
+            totalAmount: totalRev + ship, 
+            cost: totalCost // Tổng giá vốn của đơn hàng
+        };
         
         let orders = loadData(KEYS.ORDERS);
         if(editingOrderId) { 
             const oldIdx = orders.findIndex(o => o.id === editingOrderId);
             if (oldIdx !== -1) {
-                orders[oldIdx].items.forEach(i => { const p = stockData.find(s => `${s.name} {V:${s.costPrice}}` === i.name); if(p) p.quantityOut -= i.quantity; }); 
-                items.forEach(i => { const p = stockData.find(s => `${s.name} {V:${s.costPrice}}` === i.name); if(p) p.quantityOut += i.quantity; }); 
-                orders[oldIdx] = order; alert('Cập nhật đơn hàng thành công!'); 
+                // Hoàn lại kho cũ
+                orders[oldIdx].items.forEach(i => { 
+                    const p = stockData.find(s => normalizeStr(s.name) === normalizeStr(i.name)); 
+                    if(p) p.quantityOut -= i.quantity; 
+                }); 
+                // Trừ kho mới
+                items.forEach(i => { 
+                    const p = stockData.find(s => normalizeStr(s.name) === normalizeStr(i.name)); 
+                    if(p) p.quantityOut += i.quantity; 
+                }); 
+                orders[oldIdx] = order; alert('Đã cập nhật đơn hàng!'); 
             }
         } else { 
-            items.forEach(i => { const p = stockData.find(s => `${s.name} {V:${s.costPrice}}` === i.name); if(p) p.quantityOut += i.quantity; }); 
-            orders.push(order); alert('Lưu đơn mới thành công!'); 
+            // Trừ kho cho đơn mới
+            items.forEach(i => { 
+                const p = stockData.find(s => normalizeStr(s.name) === normalizeStr(i.name)); 
+                if(p) p.quantityOut += i.quantity; 
+            }); 
+            orders.push(order); alert('Đã lưu đơn mới!'); 
         }
 
-        // Cập nhật CRM (Logic sửa: Tìm đúng SĐT để update hoặc thêm mới)
         let customers = loadData(KEYS.CUSTOMERS);
-        let existingCustIndex = customers.findIndex(c => c.phone === custPhone);
-        if (existingCustIndex >= 0) { 
-            customers[existingCustIndex].name = custName; 
-            customers[existingCustIndex].address = custAddr; 
-        } else { 
-            customers.push({name: custName, phone: custPhone, address: custAddr, note: ''}); 
-        }
+        let existingCustIndex = customers.findIndex(c => String(c.phone).trim() === String(custPhone).trim());
+        if (existingCustIndex >= 0) { customers[existingCustIndex].name = custName; customers[existingCustIndex].address = custAddr; } 
+        else { customers.push({name: custName, phone: custPhone, address: custAddr}); }
         saveData(KEYS.CUSTOMERS, customers);
-
         saveData(KEYS.STOCK, stockData); saveData(KEYS.ORDERS, orders); cancelEditOrder();
     };
 
-    // --- CÁC LOGIC KHÁC GIỮ NGUYÊN ---
-    let currentReportPeriod = 'today'; 
-    const toggleCustomFilter = () => { const area = document.getElementById('customFilterArea'); const btn = document.getElementById('btn-custom'); if (area.classList.contains('active')) { area.classList.remove('active'); btn.classList.remove('btn-primary'); btn.classList.add('btn-secondary'); } else { area.classList.add('active'); } };
-    const filterReports = (period) => {
-        currentReportPeriod = period;
-        ['btn-today','btn-week','btn-month','btn-year','btn-all', 'btn-custom'].forEach(id=>{ const btn = document.getElementById(id); if(btn) { btn.classList.remove('btn-primary'); btn.classList.add('btn-secondary'); } });
-        if (period === 'custom') { document.getElementById('btn-custom').classList.add('btn-primary'); document.getElementById('customFilterArea').classList.add('active'); } 
-        else { const activeBtn = document.getElementById('btn-'+period); if(activeBtn) { activeBtn.classList.remove('btn-secondary'); activeBtn.classList.add('btn-primary'); } document.getElementById('customFilterArea').classList.remove('active'); }
-        let startDate, endDate; const now = new Date(); now.setHours(0,0,0,0);
-        if (period === 'today') { startDate = new Date(now); endDate = new Date(now); endDate.setHours(23,59,59,999); } 
-        else if (period === 'week') { startDate = new Date(now); startDate.setDate(now.getDate() - now.getDay() + 1); endDate = new Date(now); endDate.setHours(23,59,59,999); } 
-        else if (period === 'month') { startDate = new Date(now.getFullYear(), now.getMonth(), 1); endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59); } 
-        else if (period === 'year') { startDate = new Date(now.getFullYear(), 0, 1); endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59); } 
-        else if (period === 'all') { startDate = new Date(1970, 0, 1); endDate = new Date(2100, 0, 1); } 
-        else if (period === 'custom') { const s = document.getElementById('filterStart').value; const e = document.getElementById('filterEnd').value; if(!s || !e) { alert('Vui lòng chọn ngày!'); return; } startDate = new Date(s); startDate.setHours(0,0,0,0); endDate = new Date(e); endDate.setHours(23,59,59,999); }
-        const checkDate = (dateStr) => { if(!dateStr) return false; const d = new Date(dateStr); return d >= startDate && d <= endDate; };
-        const orders = loadData(KEYS.ORDERS).filter(o => checkDate(o.date));
-        const cashflow = loadData(KEYS.CASHFLOW).filter(c => checkDate(c.date));
-        let totalRev = 0, totalCOGS = 0; orders.forEach(o => { totalRev += o.totalAmount; totalCOGS += (o.cost || 0); });
-        let otherIncome = 0, totalExpense = 0; const rptGenExpTable = document.getElementById('rptGenExpTable').querySelector('tbody'); rptGenExpTable.innerHTML = '';
-        cashflow.forEach(c => { if(c.type === 'THU') { otherIncome += c.amount; } else { totalExpense += c.amount; rptGenExpTable.innerHTML += `<tr><td>${new Date(c.date).toLocaleDateString('vi-VN')}</td><td>${c.category}</td><td class="text-right" style="color:red">${formatCurrency(c.amount)}</td></tr>`; } });
-        const grossProfit = totalRev - totalCOGS; const netProfit = grossProfit + otherIncome - totalExpense; 
-        document.getElementById('kpiRevenue').textContent = formatCurrency(totalRev);
-        const stockData = loadData(KEYS.STOCK); const totalImport = stockData.reduce((sum, s) => sum + (s.quantityIn * s.costPrice), 0);
-        document.getElementById('kpiTotalImport').textContent = formatCurrency(totalImport); document.getElementById('kpiTotalExpense').textContent = formatCurrency(totalExpense); document.getElementById('kpiNetProfit').textContent = formatCurrency(netProfit); document.getElementById('kpiNetProfit').style.color = netProfit >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
-        document.getElementById('rptRev').textContent = formatCurrency(totalRev); document.getElementById('rptCOGS').textContent = formatCurrency(totalCOGS); document.getElementById('rptGrossProfit').textContent = formatCurrency(grossProfit); document.getElementById('rptOtherInc').textContent = formatCurrency(otherIncome); document.getElementById('rptOtherExp').textContent = formatCurrency(totalExpense); document.getElementById('rptNetProfit').textContent = formatCurrency(netProfit);
-        const margin = totalRev > 0 ? (netProfit / totalRev) * 100 : 0; document.getElementById('profitMargin').textContent = margin.toFixed(1) + '%'; document.getElementById('barProfit').style.width = Math.min(Math.max(margin, 0), 100) + '%';
-        const tb = document.getElementById('rptOrdersTable').querySelector('tbody'); tb.innerHTML = ''; orders.forEach(o => { const oNet = (o.totalAmount - (o.cost||0)); tb.innerHTML += `<tr><td>${o.customer.name}</td><td>${o.id}</td><td>${new Date(o.date).toLocaleDateString('vi-VN')}</td><td class="text-right">${formatCurrency(o.totalAmount)}</td><td class="text-right">${formatCurrency(oNet)}</td><td><button class="btn btn-warning btn-sm" onclick="startEditOrder('${o.id}')">Sửa</button> <button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">Hủy</button></td></tr>`; });
-        const tbOrderExp = document.getElementById('rptOrderExpTable').querySelector('tbody'); tbOrderExp.innerHTML = ''; orders.filter(o => o.shipping !== 0).forEach(o => { tbOrderExp.innerHTML += `<tr><td>${o.id}</td><td class="text-right">${formatCurrency(Math.abs(o.shipping))}</td><td>${o.shipping > 0 ? 'Thu ship' : 'Trợ giá ship'}</td></tr>`; });
-        drawCharts(orders);
+    const updateProductDatalist = (el) => { const stock = loadData(KEYS.STOCK); document.getElementById(el).innerHTML = stock.map(s => `<option value="${s.name} {V:${s.costPrice}}">Tồn: ${s.quantityIn - s.quantityOut} - Vốn: ${formatCurrency(s.costPrice)}</option>`).join(''); }
+    const updateInvoicePreview = () => { 
+        const id = editingOrderId || (document.getElementById('orderIDDisplay')?.value || generateID()); document.getElementById('invID').textContent = id; 
+        const inputDate = document.getElementById('orderDate').value; document.getElementById('invDate').textContent = inputDate ? new Date(inputDate).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'); 
+        document.getElementById('invStaff').textContent = document.getElementById('saleStaffSelect').value || '...'; 
+        const s = loadData(KEYS.STAFF).find(x => x.name === document.getElementById('saleStaffSelect').value); document.getElementById('invStaffPhone').textContent = s ? s.phone : '...'; 
+        document.getElementById('invCustName').textContent = document.getElementById('custName').value || '...'; 
+        document.getElementById('invCustPhone').textContent = document.getElementById('custPhone').value || '...'; 
+        document.getElementById('invCustAddr').textContent = document.getElementById('custAddress').value || '...'; 
+        document.getElementById('invNoteText').textContent = document.getElementById('orderNote').value || '...'; 
+        
+        let subTotal = 0, htmlRows = '', stt = 1; 
+        document.querySelectorAll('#orderItemsBody tr').forEach(row => { 
+            const rawName = row.querySelector('.item-name').value; const displayName = rawName.split(' {V:')[0]; const qty = parseFloat(row.querySelector('.item-qty').value)||0; const price = parseFloat(row.querySelector('.item-price').value)||0; const total = qty * price; 
+            if(rawName) { subTotal += total; htmlRows += `<tr><td class="text-center">${stt++}</td><td>${displayName}</td><td class="text-center">Cái</td><td class="text-center">${qty}</td><td class="text-right">${formatCurrency(price).replace('₫','')}</td><td class="text-right">${formatCurrency(total).replace('₫','')}</td></tr>`; } 
+        }); 
+        document.getElementById('invItemsList').innerHTML = htmlRows; document.getElementById('invSubTotal').textContent = formatCurrency(subTotal); 
+        const ship = parseFloat(document.getElementById('shippingCost').value)||0; document.getElementById('invShip').textContent = formatCurrency(ship); 
+        document.getElementById('invTotal').textContent = formatCurrency(subTotal+ship); document.getElementById('invTotalText').textContent = "(Bằng chữ)"; 
     };
 
-    const submitStockEntry = () => { const supplier = document.getElementById('stockSupplier').value; if (!supplier) { alert('Chọn NCC!'); return; } const rows = document.querySelectorAll('#stockEntryBody tr'); let stock = loadData(KEYS.STOCK); let count = 0; rows.forEach(row => { const name = row.querySelector('.stock-name').value.trim(); const qty = parseInt(row.querySelector('.stock-qty').value); const cost = parseFloat(row.querySelector('.stock-cost').value); const note = row.querySelector('.stock-note').value; if(name && qty > 0) { let item = stock.find(s => s.name === name && parseFloat(s.costPrice) === cost); if(item) { item.quantityIn += qty; item.supplier = supplier; item.note = note || item.note; } else { stock.push({name, quantityIn: qty, quantityOut: 0, costPrice: cost, supplier, note}); } count++; } }); if(count > 0) { saveData(KEYS.STOCK, stock); alert(`Nhập ${count} mã hàng thành công!`); document.getElementById('stockEntryBody').innerHTML = ''; createStockRow(); renderInventory(); updateProductDatalist('productListStock'); } };
-    const updateProductDatalist = (el) => { const stock = loadData(KEYS.STOCK); const list = document.getElementById(el); if(list) { list.innerHTML = stock.map(s => `<option value="${s.name} {V:${s.costPrice}}">Tồn: ${s.quantityIn - s.quantityOut} - Vốn: ${formatCurrency(s.costPrice)}</option>`).join(''); } }
-    const updateInvoicePreview = () => { const id = editingOrderId || (document.getElementById('orderIDDisplay')?.value || generateID()); document.getElementById('invID').textContent = id; const inputDate = document.getElementById('orderDate').value; document.getElementById('invDate').textContent = inputDate ? new Date(inputDate).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'); const staffSel = document.getElementById('saleStaffSelect'); document.getElementById('invStaff').textContent = staffSel.value || '...'; const s = loadData(KEYS.STAFF).find(x => x.name === staffSel.value); document.getElementById('invStaffPhone').textContent = s ? s.phone : '...'; document.getElementById('invCustName').textContent = document.getElementById('custName').value || '...'; document.getElementById('invCustPhone').textContent = document.getElementById('custPhone').value || '...'; document.getElementById('invCustAddr').textContent = document.getElementById('custAddress').value || '...'; let subTotal = 0, htmlRows = '', stt = 1; document.querySelectorAll('#orderItemsBody tr').forEach(row => { const rawName = row.querySelector('.item-name').value; const displayName = rawName.split(' {V:')[0]; const qty = parseFloat(row.querySelector('.item-qty').value)||0; const price = parseFloat(row.querySelector('.item-price').value)||0; const total = qty * price; if(rawName) { subTotal += total; htmlRows += `<tr><td class="text-center">${stt++}</td><td>${displayName}</td><td class="text-center">Cái</td><td class="text-center">${qty}</td><td class="text-right">${formatCurrency(price).replace('₫','')}</td><td class="text-right">${formatCurrency(total).replace('₫','')}</td></tr>`; } }); document.getElementById('invItemsList').innerHTML = htmlRows; document.getElementById('invSubTotal').textContent = formatCurrency(subTotal); const ship = parseFloat(document.getElementById('shippingCost').value)||0; document.getElementById('invShip').textContent = formatCurrency(ship); document.getElementById('invTotal').textContent = formatCurrency(subTotal+ship); document.getElementById('invTotalText').textContent = "(Bằng chữ)"; };
     const createOrderItemRow = (p='', q=1, pr=0) => {const tbody = document.getElementById('orderItemsBody'); const row = tbody.insertRow(); row.innerHTML = `<td><input type="text" class="form-control item-name" list="productListSales" value="${p}" placeholder="Gõ tên..." onchange="updateInvoicePreview()"></td><td><input type="number" class="form-control item-qty" value="${q}" oninput="updateInvoicePreview()"></td><td><input type="number" class="form-control item-price" value="${pr||''}" placeholder="0" oninput="updateInvoicePreview()"></td><td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove(); updateInvoicePreview()">x</button></td>`;};
-    const startEditOrder = (id) => { const o = loadData(KEYS.ORDERS).find(x=>x.id===id); if(!o) return; switchTab('tab-sales'); editingOrderId = id; document.getElementById('editModeBanner').style.display='block'; document.getElementById('editingOrderIDText').textContent = id; document.getElementById('btnSaveOrder').textContent = "💾 CẬP NHẬT"; document.getElementById('btnSaveOrder').classList.replace('btn-primary','btn-warning'); document.getElementById('btnCancelEdit').style.display = 'inline-block'; document.getElementById('custPhone').value = o.customer.phone; document.getElementById('custName').value = o.customer.name; document.getElementById('custAddress').value = o.customer.address; document.getElementById('shippingCost').value = o.shipping; const sel = document.getElementById('saleStaffSelect'); sel.value = o.staff; document.getElementById('orderItemsBody').innerHTML=''; o.items.forEach(i=>createOrderItemRow(i.name, i.quantity, i.price)); if(o.date) document.getElementById('orderDate').value = new Date(o.date).toISOString().slice(0,10); updateInvoicePreview(); }
-    const cancelEditOrder = () => { editingOrderId = null; document.getElementById('editModeBanner').style.display='none'; document.getElementById('btnSaveOrder').textContent = "✅ LƯU ĐƠN"; document.getElementById('btnSaveOrder').classList.replace('btn-warning','btn-primary'); document.getElementById('btnCancelEdit').style.display='none'; document.getElementById('custPhone').value=''; document.getElementById('custName').value=''; document.getElementById('custAddress').value=''; document.getElementById('shippingCost').value=0; document.getElementById('orderItemsBody').innerHTML=''; createOrderItemRow(); document.getElementById('orderDate').value = new Date().toISOString().slice(0,10); updateInvoicePreview(); }
-    const renderCashflow = () => { const list = loadData(KEYS.CASHFLOW); const tbody = document.getElementById('cashflowTable').querySelector('tbody'); tbody.innerHTML = ''; list.forEach((item, index) => { const color = item.type === 'THU' ? 'green' : 'red'; tbody.innerHTML += `<tr><td>${new Date(item.date).toLocaleDateString('vi-VN')}</td><td style="font-weight:bold; color:${color}">${item.type}</td><td style="font-weight:bold; color:${color}">${formatCurrency(item.amount)}</td><td>${item.orderId || '-'}</td><td>${item.category}</td><td>${item.note || ''}</td><td><button class="btn btn-danger btn-sm" onclick="delCashflow(${index})">X</button></td></tr>`; }); };
-    const handleCashflowSubmit = (e) => { e.preventDefault(); const data = { date: document.getElementById('cfDate').value, type: document.getElementById('cfType').value, amount: parseFloat(document.getElementById('cfAmount').value), orderId: document.getElementById('cfOrderId').value, category: document.getElementById('cfCategory').value, note: document.getElementById('cfNote').value }; let list = loadData(KEYS.CASHFLOW); list.push(data); saveData(KEYS.CASHFLOW, list); alert('Đã lưu phiếu!'); document.getElementById('cashflowForm').reset(); document.getElementById('cfDate').valueAsDate = new Date(); renderCashflow(); };
-    const delCashflow = (index) => { if(confirm('Xóa phiếu này?')) { let list = loadData(KEYS.CASHFLOW); list.splice(index, 1); saveData(KEYS.CASHFLOW, list); renderCashflow(); } };
-    const createStockRow = () => { const tbody = document.getElementById('stockEntryBody'); if(tbody.innerHTML.trim() === '' || event?.type === 'click') { const row = tbody.insertRow(); row.innerHTML = `<td><input type="text" class="form-control stock-name" list="productListStock" placeholder="Tên SP" onchange="fillStockInfo(this)"></td><td><input type="number" class="form-control stock-qty" min="1" value="1"></td><td><input type="number" class="form-control stock-cost" min="0" placeholder="0"></td><td><input type="text" class="form-control stock-note" placeholder="Ghi chú"></td><td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">x</button></td>`; } };
-    const fillStockInfo = (input) => { const name = input.value; const stock = loadData(KEYS.STOCK).find(s => s.name === name); if(stock) input.closest('tr').querySelector('.stock-cost').value = stock.costPrice; };
-    const renderInventory = () => { const filterSup = document.getElementById('filterSupplier')?.value; let stock = loadData(KEYS.STOCK); if(filterSup) stock = stock.filter(s => s.supplier === filterSup); const tbody = document.getElementById('inventoryTable').querySelector('tbody'); tbody.innerHTML = ''; stock.forEach((s, i) => { const avail = s.quantityIn - s.quantityOut; tbody.innerHTML += `<tr><td><input class="editable-input" value="${s.name}" onchange="updateStock(${i}, 'name', this.value)"></td><td><input class="editable-input" list="stockSupplierList" value="${s.supplier||''}" onchange="updateStock(${i}, 'supplier', this.value)"></td><td><input type="number" class="editable-input" style="width:60px" value="${s.quantityIn}" onchange="updateStock(${i}, 'quantityIn', this.value)"></td><td><input type="number" class="editable-input" style="width:60px" value="${s.quantityOut}" onchange="updateStock(${i}, 'quantityOut', this.value)"></td><td style="font-weight:bold; color:${avail<5?'red':'green'}">${avail}</td><td><input type="number" class="editable-input" value="${s.costPrice}" onchange="updateStock(${i}, 'costPrice', this.value)"></td><td>${s.note||''}</td><td><button class="btn btn-danger btn-sm" onclick="delItem(KEYS.STOCK, ${i}, 'renderInventory')">X</button></td></tr>`; }); if(!document.getElementById('stockSupplierList')) { const dl = document.createElement('datalist'); dl.id = 'stockSupplierList'; loadData(KEYS.SUPPLIERS).forEach(sup => { const op = document.createElement('option'); op.value = sup.name; dl.appendChild(op); }); document.body.appendChild(dl); } };
-    const updateStock = (idx, field, val) => { let s = loadData(KEYS.STOCK); if(field === 'quantityIn' || field === 'quantityOut' || field === 'costPrice') { s[idx][field] = parseFloat(val) || 0; } else { s[idx][field] = val; } saveData(KEYS.STOCK, s); renderInventory(); };
-    const sortInventory = (type) => { let stock = loadData(KEYS.STOCK); if(type === 'stock') stock.sort((a,b) => (b.quantityIn - b.quantityOut) - (a.quantityIn - a.quantityOut)); if(type === 'sold') stock.sort((a,b) => b.quantityOut - a.quantityOut); const tbody = document.getElementById('inventoryTable').querySelector('tbody'); tbody.innerHTML = ''; stock.forEach((s) => { const avail = s.quantityIn - s.quantityOut; tbody.innerHTML += `<tr><td>${s.name}</td><td>${s.supplier}</td><td>${s.quantityIn}</td><td>${s.quantityOut}</td><td style="font-weight:bold">${avail}</td><td>${formatCurrency(s.costPrice)}</td><td>${s.note}</td><td>-</td></tr>`; }); };
-    const renderSuppliers = () => { const tb = document.getElementById('supplierTable').querySelector('tbody'); tb.innerHTML = ''; const term = document.getElementById('searchSupplier')?.value.toLowerCase() || ''; let suppliers = loadData(KEYS.SUPPLIERS); if (term) suppliers = suppliers.filter(s => s.name.toLowerCase().includes(term)); suppliers.forEach((s, i) => { tb.innerHTML += `<tr><td><input class="editable-input" value="${s.name}" onchange="updSupp(${i},'name',this.value)"></td><td>${s.phone||''}</td><td>${s.address||''}</td><td><button class="btn btn-danger btn-sm" onclick="delItem(KEYS.SUPPLIERS,${i},'renderSuppliers')">X</button></td></tr>`; }); };
-    const searchOrderTable = () => { const term = document.getElementById('searchOrderReport').value.toLowerCase(); document.querySelectorAll('#rptOrdersTable tbody tr').forEach(r => { r.style.display = r.innerText.toLowerCase().includes(term) ? '' : 'none'; }); };
-    const delItem=(key,idx,renderFunc)=>{if(confirm('Xóa?')){let d=loadData(key);d.splice(idx,1);saveData(key,d);window[renderFunc]();}}
-    const updSupp=(i,f,v)=>{let s=loadData(KEYS.SUPPLIERS);s[i][f]=v;saveData(KEYS.SUPPLIERS,s);populateSupplierSelect();}
-    const populateSupplierSelect=()=>{const sel=document.getElementById('stockSupplier');const filter=document.getElementById('filterSupplier'); let html='<option value="">-- Chọn NCC --</option>'; loadData(KEYS.SUPPLIERS).forEach(s=>{html+=`<option value="${s.name}">${s.name}</option>`}); sel.innerHTML=html; if(filter) filter.innerHTML='<option value="">Tất cả NCC</option>'+html;}
-    const handleAddSupplier = (e)=>{e.preventDefault();let s=loadData(KEYS.SUPPLIERS);s.push({name:document.getElementById('suppName').value,phone:document.getElementById('suppPhone').value,address:document.getElementById('suppAddr').value});saveData(KEYS.SUPPLIERS,s);e.target.reset();renderSuppliers();populateSupplierSelect();};
-    const renderStaff=()=>{const tb=document.getElementById('staffTable').querySelector('tbody');tb.innerHTML='';loadData(KEYS.STAFF).forEach((s,i)=>{tb.innerHTML+=`<tr><td>${s.name}</td><td>${s.phone}</td><td>${s.address}</td><td>${s.note||''}</td><td><button class="btn btn-danger btn-sm" onclick="delItem(KEYS.STAFF,${i},'renderStaff')">X</button></td></tr>`});}
-    const handleAddStaff = (e)=>{e.preventDefault();let s=loadData(KEYS.STAFF);s.push({name:document.getElementById('staffName').value,phone:document.getElementById('staffPhone').value,address:document.getElementById('staffAddress').value,note:document.getElementById('staffNote').value});saveData(KEYS.STAFF,s);e.target.reset();renderStaff();};
-    const populateStaffSelect=()=>{const sel=document.getElementById('saleStaffSelect');sel.innerHTML='<option value="">--Chọn Sales--</option>';loadData(KEYS.STAFF).forEach(s=>sel.innerHTML+=`<option value="${s.name}">${s.name}</option>`);}
-    const findCustomerByPhone=()=>{const p=document.getElementById('custPhone').value;const c=loadData(KEYS.CUSTOMERS).find(x=>x.phone===p);if(c){document.getElementById('custName').value=c.name;document.getElementById('custAddress').value=c.address;updateInvoicePreview();}}
-    const deleteOrder = (id) => { if(!confirm('Hủy đơn và hoàn kho?')) return; let orders=loadData(KEYS.ORDERS); const idx=orders.findIndex(o=>o.id===id); if(idx===-1)return; let stock=loadData(KEYS.STOCK); orders[idx].items.forEach(i=>{let p=stock.find(s=>`${s.name} {V:${s.costPrice}}`===i.name); if(p)p.quantityOut-=i.quantity;}); orders.splice(idx,1); saveData(KEYS.STOCK,stock); saveData(KEYS.ORDERS,orders); alert('Đã hủy đơn'); filterReports(currentReportPeriod || 'today'); };
-    const exportData = () => { try { const data = {}; for (let k in KEYS) data[k] = loadData(KEYS[k]); const blob = new Blob([JSON.stringify(data)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `backup_pro_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); } catch (err) { alert('Lỗi sao lưu: ' + err.message); } };
-    const handleFileImport = (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { try { const d = JSON.parse(ev.target.result); if (confirm('Cảnh báo: Dữ liệu hiện tại sẽ bị thay thế bởi bản sao lưu. Tiếp tục?')) { for (let k in KEYS) { if (d[k]) saveData(KEYS[k], d[k]); } alert('Phục hồi thành công!'); location.reload(); } } catch (err) { alert('File không hợp lệ!'); } }; r.readAsText(f); };
-    const updateOrderDatalist = () => { const orders = loadData(KEYS.ORDERS); const datalist = document.getElementById('orderListSuggestions'); if (datalist) { const sortedOrders = orders.sort((a, b) => new Date(b.date) - new Date(a.date)); datalist.innerHTML = sortedOrders.map(o => `<option value="${o.id}">Khách: ${o.customer.name} - ${formatCurrency(o.totalAmount)}</option>`).join(''); } };
-    const drawCharts = (orders) => { const salesMap = {}; orders.forEach(o => { const name = o.staff || 'Chưa gán'; if(!salesMap[name]) salesMap[name] = 0; salesMap[name] += o.totalAmount; }); const sortedSales = Object.entries(salesMap).sort((a,b)=>b[1]-a[1]).slice(0, 5); const maxSalesVal = sortedSales.length > 0 ? sortedSales[0][1] : 1; document.getElementById('chartTopSales').innerHTML = `<div class="chart-container">` + sortedSales.map(([name, val]) => { const percent = (val / maxSalesVal) * 100; return `<div class="chart-column"><div class="chart-bar" style="height:${percent}%; background-color:var(--primary-color)" title="${name}: ${formatCurrency(val)}"><div class="chart-value">${formatCurrency(val, true)}</div></div><div class="chart-label">${name}</div></div>`; }).join('') + `</div>` || '<p class="text-center">Chưa có dữ liệu</p>'; const custMap = {}; orders.forEach(o => { const phone = o.customer.phone || 'passerby'; if(!custMap[phone]) custMap[phone] = {name: o.customer.name, val:0}; custMap[phone].val += o.totalAmount; }); const sortedCust = Object.values(custMap).sort((a,b)=>b.val-a.val).slice(0, 5); const maxCustVal = sortedCust.length > 0 ? sortedCust[0].val : 1; document.getElementById('chartTopCustomers').innerHTML = `<div class="chart-container">` + sortedCust.map(c => { const percent = (c.val / maxCustVal) * 100; return `<div class="chart-column"><div class="chart-bar" style="height:${percent}%; background-color:var(--success-color)" title="${c.name}: ${formatCurrency(c.val)}"><div class="chart-value">${formatCurrency(c.val, true)}</div></div><div class="chart-label">${c.name}</div></div>`; }).join('') + `</div>` || '<p class="text-center">Chưa có dữ liệu</p>'; }
+    
+    const startEditOrder = (id) => { 
+        const o = loadData(KEYS.ORDERS).find(x=>x.id===id); if(!o) return; 
+        switchTab('tab-sales'); editingOrderId = id; 
+        document.getElementById('editModeBanner').style.display='block'; document.getElementById('editingOrderIDText').textContent = id; 
+        document.getElementById('btnSaveOrder').textContent = "💾 CẬP NHẬT"; document.getElementById('btnSaveOrder').classList.replace('btn-primary','btn-warning'); document.getElementById('btnCancelEdit').style.display = 'inline-block'; 
+        document.getElementById('custPhone').value = o.customer.phone; document.getElementById('custName').value = o.customer.name; document.getElementById('custAddress').value = o.customer.address; 
+        document.getElementById('shippingCost').value = o.shipping; document.getElementById('orderNote').value = o.note || ''; document.getElementById('internalNote').value = o.internalNote || ''; 
+        document.getElementById('saleStaffSelect').value = o.staff; document.getElementById('orderItemsBody').innerHTML=''; 
+        o.items.forEach(i=>createOrderItemRow(i.fullName || i.name, i.quantity, i.price)); // Dùng fullName để load lại datalist
+        if(o.date) document.getElementById('orderDate').value = new Date(o.date).toISOString().slice(0,10); 
+        updateInvoicePreview(); 
+    }
+    
+    const cancelEditOrder = () => { 
+        editingOrderId = null; document.getElementById('editModeBanner').style.display='none'; 
+        document.getElementById('btnSaveOrder').textContent = "✅ LƯU ĐƠN"; document.getElementById('btnSaveOrder').classList.replace('btn-warning','btn-primary'); document.getElementById('btnCancelEdit').style.display='none'; 
+        document.getElementById('custPhone').value=''; document.getElementById('custName').value=''; document.getElementById('custAddress').value=''; document.getElementById('shippingCost').value=0; document.getElementById('orderNote').value=''; document.getElementById('internalNote').value=''; 
+        document.getElementById('orderItemsBody').innerHTML=''; createOrderItemRow(); document.getElementById('orderDate').value = new Date().toISOString().slice(0,10); updateInvoicePreview(); 
+    }
+
+    // --- KHO HÀNG & NHÂN SỰ ---
+    const renderStaff = () => { document.querySelector('#staffTable tbody').innerHTML = loadData(KEYS.STAFF).map((s, i) => `<tr><td>${s.name}</td><td>${s.phone}</td><td>${s.address}</td><td>${s.note}</td><td><button class="btn btn-danger btn-sm" onclick="deleteItem('${KEYS.STAFF}', ${i}, renderStaff)">X</button></td></tr>`).join(''); };
+    const handleAddStaff = (e) => { e.preventDefault(); const staff = loadData(KEYS.STAFF); staff.push({ name: document.getElementById('staffName').value, phone: document.getElementById('staffPhone').value, address: document.getElementById('staffAddress').value, note: document.getElementById('staffNote').value }); saveData(KEYS.STAFF, staff); renderStaff(); e.target.reset(); };
+    const populateStaffSelect = () => { document.getElementById('saleStaffSelect').innerHTML = '<option value="">-- Chọn sales --</option>' + loadData(KEYS.STAFF).map(s => `<option value="${s.name}">${s.name}</option>`).join(''); };
+
+    const renderSuppliers = () => { document.querySelector('#supplierTable tbody').innerHTML = loadData(KEYS.SUPPLIERS).map((s, i) => `<tr><td>${s.name}</td><td>${s.phone}</td><td>${s.address}</td><td><button class="btn btn-danger btn-sm" onclick="deleteItem('${KEYS.SUPPLIERS}', ${i}, renderSuppliers)">X</button></td></tr>`).join(''); };
+    const handleAddSupplier = (e) => { e.preventDefault(); const sups = loadData(KEYS.SUPPLIERS); sups.push({ name: document.getElementById('suppName').value, phone: document.getElementById('suppPhone').value, address: document.getElementById('suppAddr').value }); saveData(KEYS.SUPPLIERS, sups); renderSuppliers(); populateSupplierSelect(); e.target.reset(); };
+    const populateSupplierSelect = () => { const sups = loadData(KEYS.SUPPLIERS); [document.getElementById('stockSupplier'), document.getElementById('filterSupplier')].forEach(el => { if(el) el.innerHTML = '<option value="">-- Chọn NCC --</option>' + sups.map(s => `<option value="${s.name}">${s.name}</option>`).join(''); }); };
+    
+    const createStockRow = () => { const tbody = document.getElementById('stockEntryBody'); const row = tbody.insertRow(); row.innerHTML = `<td><input type="text" class="form-control stock-name" list="productListStock" placeholder="Tên SP"></td><td><input type="number" class="form-control stock-qty" value="1"></td><td><input type="number" class="form-control stock-price" placeholder="Giá vốn"></td><td><input type="text" class="form-control stock-note"></td><td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">x</button></td>`; };
+    
+    const submitStockEntry = () => {
+        const supplier = document.getElementById('stockSupplier').value; const rows = document.querySelectorAll('#stockEntryBody tr'); let stock = loadData(KEYS.STOCK);
+        rows.forEach(row => {
+            const name = row.querySelector('.stock-name').value.split(' {V:')[0]; const qty = parseFloat(row.querySelector('.stock-qty').value); const price = parseFloat(row.querySelector('.stock-price').value); const note = row.querySelector('.stock-note').value;
+            if(name && qty > 0) {
+                let exist = stock.find(s => normalizeStr(s.name) === normalizeStr(name) && s.costPrice == price);
+                if(exist) { exist.quantityIn += qty; exist.supplier = supplier || exist.supplier; }
+                else { stock.push({ name, quantityIn: qty, quantityOut: 0, costPrice: price || 0, supplier, note }); }
+            }
+        });
+        saveData(KEYS.STOCK, stock); alert('Nhập kho thành công!'); renderInventory(); document.getElementById('stockEntryBody').innerHTML=''; createStockRow();
+    };
+
+    const renderInventory = () => {
+        let stock = loadData(KEYS.STOCK); const filterSup = document.getElementById('filterSupplier').value;
+        if(filterSup) stock = stock.filter(s => s.supplier === filterSup);
+        document.querySelector('#inventoryTable tbody').innerHTML = stock.map((s, i) => `
+            <tr>
+                <td><input type="text" class="editable-input" value="${s.name}" onchange="updateStockItem(${i}, 'name', this.value)"></td>
+                <td class="text-center"><input type="number" style="width:60px" value="${s.quantityIn}" onchange="updateStockItem(${i}, 'quantityIn', this.value)"></td>
+                <td class="text-center">${s.quantityOut}</td>
+                <td class="text-center" style="font-weight:bold; color:${(s.quantityIn-s.quantityOut)<5?'red':'green'}">${s.quantityIn - s.quantityOut}</td>
+                <td class="text-right"><input type="number" style="width:80px" value="${s.costPrice}" onchange="updateStockItem(${i}, 'costPrice', this.value)"></td>
+                <td><input type="text" style="width:100%" value="${s.note||''}" onchange="updateStockItem(${i}, 'note', this.value)"></td>
+                <td><button class="btn btn-danger btn-sm" onclick="deleteItem('${KEYS.STOCK}', ${i}, renderInventory)">X</button></td>
+            </tr>`).join('');
+    };
+
+    const updateStockItem = (index, field, value) => {
+        let stock = loadData(KEYS.STOCK);
+        if(field === 'quantityIn' || field === 'costPrice') value = parseFloat(value) || 0;
+        stock[index][field] = value;
+        saveData(KEYS.STOCK, stock);
+        renderInventory(); 
+        updateProductDatalist('productListStock');
+    };
+
+    // --- BÁO CÁO & THU CHI ---
+    // Sửa lỗi: Gọi saveData và renderCashflow ngay sau khi push
+    const handleCashflowSubmit = (e) => { 
+        e.preventDefault(); 
+        const cf = { date: document.getElementById('cfDate').value, type: document.getElementById('cfType').value, amount: parseFloat(document.getElementById('cfAmount').value), orderId: document.getElementById('cfOrderId').value, category: document.getElementById('cfCategory').value, note: document.getElementById('cfNote').value }; 
+        const list = loadData(KEYS.CASHFLOW);
+        list.push(cf); 
+        saveData(KEYS.CASHFLOW, list); // Lưu ngay
+        renderCashflow(); // Render ngay
+        e.target.reset(); 
+        alert("Đã lưu phiếu thành công!");
+    };
+    
+    const renderCashflow = () => { document.querySelector('#cashflowTable tbody').innerHTML = loadData(KEYS.CASHFLOW).sort((a,b)=>new Date(b.date)-new Date(a.date)).map((c, i) => `<tr><td>${c.date}</td><td style="color:${c.type==='THU'?'green':'red'}">${c.type}</td><td>${formatCurrency(c.amount)}</td><td>${c.orderId||'-'}</td><td>${c.category}</td><td><button class="btn btn-danger btn-sm" onclick="deleteItem('${KEYS.CASHFLOW}', ${i}, renderCashflow)">X</button></td></tr>`).join(''); };
+    const updateOrderDatalist = () => { document.getElementById('orderListSuggestions').innerHTML = loadData(KEYS.ORDERS).map(o => `<option value="${o.id}">`).join(''); }
+
+    const filterReports = (period) => {
+        currentReportPeriod = period;
+        document.querySelectorAll('.filter-bar .btn').forEach(b => b.classList.remove('btn-primary'));
+        document.querySelectorAll('.filter-bar .btn').forEach(b => b.classList.add('btn-secondary'));
+        document.getElementById(`btn-${period}`).classList.remove('btn-secondary');
+        document.getElementById(`btn-${period}`).classList.add('btn-primary');
+
+        let start = new Date(), end = new Date();
+        start.setHours(0,0,0,0); end.setHours(23,59,59,999);
+
+        // Logic thời gian thực
+        if(period === 'week') { const day = start.getDay(); start.setDate(start.getDate() - day + (day == 0 ? -6:1)); start.setHours(0,0,0,0); }
+        else if(period === 'month') { start.setDate(1); }
+        else if(period === 'year') { start.setMonth(0, 1); }
+        else if(period === 'all') { start = new Date(2000, 0, 1); }
+        else if(period === 'custom') { start = new Date(document.getElementById('filterStart').value); end = new Date(document.getElementById('filterEnd').value); end.setHours(23,59,59,999); }
+        
+        const orders = loadData(KEYS.ORDERS).filter(o => { const d = new Date(o.date); return d >= start && d <= end; });
+        const cashflow = loadData(KEYS.CASHFLOW).filter(c => { const d = new Date(c.date); return d >= start && d <= end; });
+        const stock = loadData(KEYS.STOCK); // Tổng kho thì tính toàn bộ hiện tại
+        
+        // Tính KPI
+        const rev = orders.reduce((sum, o) => sum + o.totalAmount, 0); // Tổng doanh thu
+        
+        // COGS (Giá vốn hàng bán): Lấy từ cost đã lưu trong đơn hàng
+        const cogs = orders.reduce((sum, o) => sum + (o.cost || 0), 0); 
+        
+        const orderCosts = orders.reduce((sum, o) => sum + (o.shipping || 0), 0); // Chi phí đơn hàng (ship)
+        
+        // Chi phí vận hành: Chỉ tính phiếu CHI, loại trừ nhập hàng
+        const opExp = cashflow.filter(c => c.type === 'CHI').reduce((sum, c) => sum + c.amount, 0);
+        const otherInc = cashflow.filter(c => c.type === 'THU').reduce((sum, c) => sum + c.amount, 0);
+        
+        // Tổng vốn nhập (Hiện tại trong kho - Tài sản)
+        const totalImport = stock.reduce((sum, s) => sum + (s.quantityIn * s.costPrice), 0);
+        
+        // Lãi Gộp = Doanh Thu - Giá Vốn - Chi Phí Đơn (Ship)
+        const grossProfit = rev - cogs - orderCosts;
+        
+        // Lãi Ròng = Lãi Gộp + Thu Khác - Chi Phí Vận Hành
+        const netProfit = grossProfit + otherInc - opExp;
+
+        // Hiển thị KPI Cards
+        document.getElementById('kpiRevenue').textContent = formatCurrency(rev);
+        document.getElementById('kpiTotalImport').textContent = formatCurrency(totalImport);
+        document.getElementById('kpiTotalExpense').textContent = formatCurrency(opExp);
+        document.getElementById('kpiNetProfit').textContent = formatCurrency(netProfit);
+
+        // Bảng cân đối chi tiết
+        document.getElementById('rptRev').textContent = formatCurrency(rev);
+        document.getElementById('rptCOGS').textContent = formatCurrency(cogs);
+        document.getElementById('rptOrderCost').textContent = formatCurrency(orderCosts);
+        document.getElementById('rptGrossProfit').textContent = formatCurrency(grossProfit);
+        document.getElementById('rptOpExp').textContent = formatCurrency(opExp);
+        document.getElementById('rptOtherInc').textContent = formatCurrency(otherInc);
+        document.getElementById('rptNetProfit').textContent = formatCurrency(netProfit);
+        
+        const margin = rev > 0 ? (grossProfit/rev*100).toFixed(1) : 0;
+        document.getElementById('profitMargin').textContent = margin + '%';
+        document.getElementById('barProfit').style.width = Math.max(0, margin) + '%';
+
+        renderOrderReportTable(orders);
+        renderExpenseDetails(orders, cashflow);
+    };
+
+    const renderOrderReportTable = (orders) => {
+        document.querySelector('#rptOrdersTable tbody').innerHTML = orders.map(o => `
+            <tr>
+                <td>${o.customer.name}<br><small>${o.customer.phone}</small></td>
+                <td><span style="color:blue; cursor:pointer;" onclick="startEditOrder('${o.id}')">${o.id}</span></td>
+                <td>${new Date(o.date).toLocaleDateString('vi-VN')}</td>
+                <td style="color:#dc3545;font-style:italic">${o.internalNote || ''}</td>
+                <td class="text-right">${formatCurrency(o.totalAmount)}</td>
+                <td class="text-right" style="font-weight:bold; color:green;">${formatCurrency(o.totalAmount - (o.cost||0))}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="startEditOrder('${o.id}')">✏️ Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">X</button>
+                </td>
+            </tr>`).join('');
+    };
+
+    const renderExpenseDetails = (orders, cashflow) => {
+        // 1. Chi phí đơn hàng (Ship)
+        const orderExps = orders.filter(o => o.shipping > 0);
+        document.querySelector('#rptOrderExpTable tbody').innerHTML = orderExps.map(o => `<tr><td>${o.id}</td><td>${formatCurrency(o.shipping)}</td><td>Phí Ship/Khác</td></tr>`).join('');
+        // 2. Chi phí vận hành
+        const opExps = cashflow.filter(c => c.type === 'CHI');
+        document.querySelector('#rptGenExpTable tbody').innerHTML = opExps.map(c => `<tr><td>${c.date}</td><td>${c.category}</td><td>${formatCurrency(c.amount)}</td></tr>`).join('');
+    };
+
+    const searchOrderTable = () => { const term = document.getElementById('searchOrderReport').value.toLowerCase(); const orders = loadData(KEYS.ORDERS).filter(o => o.id.toLowerCase().includes(term)); renderOrderReportTable(orders); };
+    const toggleCustomFilter = () => { document.getElementById('customFilterArea').classList.toggle('active'); };
+    
+    // Generic & Delete
+    const deleteItem = (key, index, callback) => { if(!confirm('Chắc chắn xóa?')) return; const data = loadData(key); data.splice(index, 1); saveData(key, data); callback(); };
+    
+    const deleteOrder = (id) => {
+         if(!confirm('Xóa đơn hàng sẽ hoàn lại số lượng tồn kho. Tiếp tục?')) return;
+         let orders = loadData(KEYS.ORDERS);
+         let stock = loadData(KEYS.STOCK);
+         const o = orders.find(x => x.id === id);
+         if(o) {
+             o.items.forEach(i => {
+                 // Tìm lại sp trong kho để cộng tồn (không phân biệt hoa thường)
+                 const p = stock.find(s => normalizeStr(s.name) === normalizeStr(i.name));
+                 if(p) p.quantityOut -= i.quantity;
+             });
+         }
+         orders = orders.filter(x => x.id !== id);
+         saveData(KEYS.STOCK, stock);
+         saveData(KEYS.ORDERS, orders);
+         alert('Đã xóa đơn hàng!');
+         filterReports(currentReportPeriod);
+    };
+
+    const printInvoice = () => { const content = document.getElementById('invoicePreview').innerHTML; const win = window.open('','','width=800,height=600'); win.document.write('<html><head><title>In Hóa Đơn</title><style>body{font-family:"Times New Roman"; padding:20px;} .invoice-box{width:100%;} .inv-table{width:100%;border-collapse:collapse;} .inv-table th, .inv-table td{border:1px solid #000;padding:5px;} .inv-title{text-align:center;font-size:24px;font-weight:bold;} .text-right{text-align:right;} .text-center{text-align:center;}</style></head><body>'+content+'</body></html>'); win.document.close(); win.print(); };
+    const exportData = () => { const data = {}; Object.values(KEYS).forEach(k => data[k] = localStorage.getItem(k)); const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); };
+    const handleFileImport = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); Object.keys(data).forEach(k => localStorage.setItem(k, data[k])); alert('Phục hồi xong!'); location.reload(); } catch { alert('File lỗi!'); } }; reader.readAsText(file); };
 </script>
 </body>
 </html>
